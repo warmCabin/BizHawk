@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Windows.Forms;
 
 using BizHawk.Emulation.Common;
+using BizHawk.Client.Common;
 
 namespace BizHawk.Client.EmuHawk
 {
@@ -14,14 +14,16 @@ namespace BizHawk.Client.EmuHawk
 	public class ConfigManager
 	{
 		private readonly MainForm _mainForm;
+		private readonly Config _config;
 
-		public ConfigManager(MainForm mainForm)
+		public ConfigManager(MainForm mainForm, Config config)
 		{
 			_mainForm = mainForm;
+			_config = config;
 		}
 
 		public bool IsAvailable<T>(IEmulatorServiceProvider serviceProvider)
-			where T : Form
+			where T : ConfigForm
 		{
 			return IsAvailable(typeof(T), serviceProvider);
 		}
@@ -44,11 +46,9 @@ namespace BizHawk.Client.EmuHawk
 		}
 
 		public T ShowDialog<T>(IEmulatorServiceProvider serviceProvider)
-			where T : Form
+			where T : ConfigForm
 		{
-
 			T newDialog = Activator.CreateInstance<T>();
-			newDialog.Owner = _mainForm;
 
 			var result = ServiceInjector.UpdateServices(serviceProvider, newDialog);
 
@@ -57,7 +57,10 @@ namespace BizHawk.Client.EmuHawk
 				throw new InvalidOperationException("Current core can not provide all the required dependencies");
 			}
 
-			// TODO: inject common properties like MainForm, Config, GameInfo here
+			newDialog.Owner = _mainForm;
+			newDialog.MainForm = _mainForm;
+			newDialog.Config = _config;
+
 			newDialog.ShowDialog();
 
 			return newDialog;
