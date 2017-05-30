@@ -2424,7 +2424,10 @@ namespace BizHawk.Client.EmuHawk
 
 		private void IntVControllerSettingsMenuItem_Click(object sender, EventArgs e)
 		{
-			new IntvControllerSettings().ShowDialog();
+			if (_configManager.IsAvailable<IntvControllerSettings>(Emulator.ServiceProvider))
+			{
+				_configManager.ShowDialog<IntvControllerSettings>(Emulator.ServiceProvider);
+			}
 		}
 
 		#endregion

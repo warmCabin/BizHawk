@@ -249,6 +249,7 @@
     <Compile Include="config\AutofireConfig.Designer.cs">
       <DependentUpon>AutofireConfig.cs</DependentUpon>
     </Compile>
+    <Compile Include="config\ConfigManager.cs" />
     <Compile Include="config\ControllerConfig.cs">
       <SubType>Form</SubType>
     </Compile>
