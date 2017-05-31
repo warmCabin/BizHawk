@@ -2202,7 +2202,10 @@ namespace BizHawk.Client.EmuHawk
 
 		private void ColecoControllerSettingsMenuItem_Click(object sender, EventArgs e)
 		{
-			new ColecoControllerSettings().ShowDialog();
+			if (_configManager.IsAvailable<ColecoControllerSettings>())
+			{
+				_configManager.ShowDialog<ColecoControllerSettings>();
+			}
 		}
 
 		#endregion
@@ -2424,9 +2427,9 @@ namespace BizHawk.Client.EmuHawk
 
 		private void IntVControllerSettingsMenuItem_Click(object sender, EventArgs e)
 		{
-			if (_configManager.IsAvailable<IntvControllerSettings>(Emulator.ServiceProvider))
+			if (_configManager.IsAvailable<IntvControllerSettings>())
 			{
-				_configManager.ShowDialog<IntvControllerSettings>(Emulator.ServiceProvider);
+				_configManager.ShowDialog<IntvControllerSettings>();
 			}
 		}
 

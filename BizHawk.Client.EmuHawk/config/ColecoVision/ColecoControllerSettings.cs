@@ -2,14 +2,17 @@
 using System.Linq;
 using System.Windows.Forms;
 
-using BizHawk.Client.Common;
+using BizHawk.Emulation.Common;
 using BizHawk.Emulation.Cores.ColecoVision;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public partial class ColecoControllerSettings : Form
+	public partial class ColecoControllerSettings : ConfigForm
 	{
 		private ColecoVision.ColecoSyncSettings _syncSettings;
+
+		[RequiredService]
+		private ColecoVision Core { get; set; }
 
 		public ColecoControllerSettings()
 		{
@@ -18,7 +21,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void ColecoControllerSettings_Load(object sender, EventArgs e)
 		{
-			_syncSettings = ((ColecoVision)Global.Emulator).GetSyncSettings().Clone();
+			_syncSettings = Core.GetSyncSettings().Clone();
 
 			var possibleControllers = ColecoVisionControllerDeck.ValidControllerTypes.Select(t => t.Key);
 
@@ -43,7 +46,7 @@ namespace BizHawk.Client.EmuHawk
 				_syncSettings.Port1 = Port1ComboBox.SelectedItem.ToString();
 				_syncSettings.Port2 = Port2ComboBox.SelectedItem.ToString();
 
-				GlobalWin.MainForm.PutCoreSyncSettings(_syncSettings);
+				MainForm.PutCoreSyncSettings(_syncSettings);
 			}
 
 			DialogResult = DialogResult.OK;

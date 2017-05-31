@@ -22,20 +22,23 @@ namespace BizHawk.Client.EmuHawk
 			_config = config;
 		}
 
-		public bool IsAvailable<T>(IEmulatorServiceProvider serviceProvider)
+		public bool IsAvailable<T>()
 			where T : ConfigForm
 		{
-			return IsAvailable(typeof(T), serviceProvider);
+			return IsAvailable(typeof(T));
 		}
 
-		private bool IsAvailable(Type t, IEmulatorServiceProvider serviceProvider)
+		private bool IsAvailable(Type t)
 		{
-			if (!ServiceInjector.IsAvailable(serviceProvider, t))
+			if (!ServiceInjector.IsAvailable(_mainForm.Emulator.ServiceProvider, t))
 			{
 				return false;
 			}
 
-			var tool = Assembly.GetExecutingAssembly().GetTypes().FirstOrDefault(type => type == t);
+			var tool = Assembly
+				.GetExecutingAssembly()
+				.GetTypes()
+				.FirstOrDefault(type => type == t);
 
 			if (tool == null) // This isn't a tool, must not be available
 			{
@@ -45,12 +48,12 @@ namespace BizHawk.Client.EmuHawk
 			return true;
 		}
 
-		public T ShowDialog<T>(IEmulatorServiceProvider serviceProvider)
+		public T ShowDialog<T>()
 			where T : ConfigForm
 		{
 			T newDialog = Activator.CreateInstance<T>();
 
-			var result = ServiceInjector.UpdateServices(serviceProvider, newDialog);
+			var result = ServiceInjector.UpdateServices(_mainForm.Emulator.ServiceProvider, newDialog);
 
 			if (!result)
 			{

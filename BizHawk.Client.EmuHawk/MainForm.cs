@@ -322,7 +322,7 @@ namespace BizHawk.Client.EmuHawk
 			GlobalWin.Sound.StartSound();
 			InputManager.RewireInputChain();
 			GlobalWin.Tools = new ToolManager(this);
-			_configManager = new ConfigManager(this);
+			_configManager = new ConfigManager(this, Global.Config);
 			RewireSound();
 
 			// Workaround for windows, location is -32000 when minimized, if they close it during this time, that's what gets saved
@@ -737,14 +737,14 @@ namespace BizHawk.Client.EmuHawk
 
 		// TODO: make this an actual property, set it when loading a Rom, and pass it dialogs, etc
 		// This is a quick hack to reduce the dependency on Global.Emulator
-		private IEmulator Emulator
+		internal IEmulator Emulator
 		{
 			get
 			{
 				return Global.Emulator;
 			}
 
-			set
+			private set
 			{
 				Global.Emulator = value;
 				_currentVideoProvider = Global.Emulator.AsVideoProviderOrDefault();
