@@ -2,19 +2,26 @@
 using System.Linq;
 using System.Windows.Forms;
 
-using BizHawk.Client.Common;
+using BizHawk.Emulation.Common;
 using BizHawk.Emulation.Cores.Nintendo.NES;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public partial class NesControllerSettings : Form
+	public partial class NesControllerSettings : ConfigForm
 	{
-		private readonly NES.NESSyncSettings _syncSettings;
+		[RequiredService]
+		private NES Core { get; set; }
+
+		private NES.NESSyncSettings _syncSettings;
 
 		public NesControllerSettings()
 		{
 			InitializeComponent();
-			_syncSettings = ((NES)Global.Emulator).GetSyncSettings();
+		}
+
+		private void NesControllerSettings_Load(object sender, EventArgs e)
+		{
+			_syncSettings = Core.GetSyncSettings();
 
 			// TODO: use combobox extension and add descriptions to enum values
 			comboBoxFamicom.Items.AddRange(NESControlSettings.GetFamicomExpansionValues().ToArray());
@@ -50,7 +57,7 @@ namespace BizHawk.Client.EmuHawk
 
 			if (changed)
 			{
-				GlobalWin.MainForm.PutCoreSyncSettings(_syncSettings);
+				MainForm.PutCoreSyncSettings(_syncSettings);
 			}
 
 			DialogResult = DialogResult.OK;
@@ -59,7 +66,6 @@ namespace BizHawk.Client.EmuHawk
 
 		private void CancelBtn_Click(object sender, EventArgs e)
 		{
-			GlobalWin.OSD.AddMessage("Controller settings aborted");
 			DialogResult = DialogResult.Cancel;
 			Close();
 		}

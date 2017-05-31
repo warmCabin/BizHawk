@@ -24,11 +24,7 @@ namespace BizHawk.Client.EmuHawk
 		public bool IsAvailable<T>()
 			where T : ConfigForm
 		{
-			return IsAvailable(typeof(T));
-		}
-
-		private bool IsAvailable(Type t)
-		{
+			Type t = typeof(T);
 			if (!ServiceInjector.IsAvailable(_mainForm.Emulator.ServiceProvider, t))
 			{
 				return false;
@@ -63,6 +59,7 @@ namespace BizHawk.Client.EmuHawk
 			newDialog.MainForm = _mainForm;
 			newDialog.Config = _mainForm.Config;
 			newDialog.Game = _mainForm.Game;
+			newDialog.OSD = _mainForm.OSD;
 			var dialogResult = newDialog.ShowDialog();
 
 			return dialogResult;

@@ -1541,7 +1541,7 @@ namespace BizHawk.Client.EmuHawk
 			NESSoundChannelsMenuItem.Enabled = GlobalWin.Tools.IsAvailable<NESSoundConfig>();
 			MovieSettingsMenuItem.Enabled = Emulator is NES && !Global.MovieSession.Movie.IsActive;
 
-			NesControllerSettingsMenuItem.Enabled = GlobalWin.Tools.IsAvailable<NesControllerSettings>()
+			NesControllerSettingsMenuItem.Enabled = _configManager.IsAvailable<NesControllerSettings>()
 				&& !Global.MovieSession.Movie.IsActive;
 
 			barcodeReaderToolStripMenuItem.Enabled = ServiceInjector.IsAvailable(Emulator.ServiceProvider, typeof(BarcodeEntry));
@@ -1593,7 +1593,7 @@ namespace BizHawk.Client.EmuHawk
 		{
 			if (Emulator is NES)
 			{
-				new NESGraphicsConfig().ShowDialog(this);
+				_configManager.ShowDialog<NESGraphicsConfig>();
 			}
 			else if (Emulator is QuickNES)
 			{
@@ -1663,7 +1663,10 @@ namespace BizHawk.Client.EmuHawk
 		{
 			if (Emulator is NES)
 			{
-				new NesControllerSettings().ShowDialog();
+				if (_configManager.ShowDialog<NesControllerSettings>() != DialogResult.OK)
+				{
+					GlobalWin.OSD.AddMessage("Controller settings aborted");
+				}
 			}
 			else if (Emulator is QuickNES)
 			{

@@ -757,6 +757,8 @@ namespace BizHawk.Client.EmuHawk
 
 		internal GameInfo Game => Global.Game;
 
+		internal OSDManager OSD => GlobalWin.OSD;
+
 		// ***********************************************
 		private IVideoProvider _currentVideoProvider = NullVideo.Instance;
 

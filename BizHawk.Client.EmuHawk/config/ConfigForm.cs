@@ -10,5 +10,6 @@ namespace BizHawk.Client.EmuHawk
 		public MainForm MainForm { get; set; }
 		public Config Config { get; set; }
 		public GameInfo Game { get; set; }
+		public OSDManager OSD { get; set; }
 	}
 }

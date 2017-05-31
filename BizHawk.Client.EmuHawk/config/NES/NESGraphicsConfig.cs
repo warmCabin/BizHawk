@@ -3,18 +3,21 @@ using System.Drawing;
 using System.Windows.Forms;
 
 using BizHawk.Common;
-using BizHawk.Client.Common;
+using BizHawk.Emulation.Common;
 using BizHawk.Emulation.Cores.Nintendo.NES;
+using BizHawk.Client.Common;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public partial class NESGraphicsConfig : Form
+	public partial class NESGraphicsConfig : ConfigForm
 	{
 		// TODO:
 		// Allow selection of palette file from archive
 		// Hotkeys for BG & Sprite display toggle
 		// NTSC filter settings? Hue, Tint (This should probably be a client thing, not a nes specific thing?)
-		private NES _nes;
+		[RequiredService]
+		private NES Emulator { get; set; }
+
 		private NES.NESSettings _settings;
 		private Bitmap _bmp;
 
@@ -25,8 +28,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void NESGraphicsConfig_Load(object sender, EventArgs e)
 		{
-			_nes = (NES)Global.Emulator;
-			_settings = _nes.GetSettings();
+			_settings = Emulator.GetSettings();
 			LoadStuff();
 		}
 
@@ -50,7 +52,7 @@ namespace BizHawk.Client.EmuHawk
 		{
 			OpenFileDialog ofd = new OpenFileDialog
 				{
-					InitialDirectory = PathManager.MakeAbsolutePath(Global.Config.PathEntries["NES", "Palettes"].Path, "NES"),
+					InitialDirectory = PathManager.MakeAbsolutePath(Config.PathEntries["NES", "Palettes"].Path, "NES"),
 					Filter = "Palette Files (.pal)|*.PAL|All Files (*.*)|*.*",
 					RestoreDirectory = true
 				};
@@ -116,7 +118,7 @@ namespace BizHawk.Client.EmuHawk
 				{
 					if (showmsg)
 					{
-						GlobalWin.OSD.AddMessage("Standard Palette set");
+						OSD.AddMessage("Standard Palette set");
 					}
 
 					return (byte[,])Palettes.QuickNESPalette.Clone();
@@ -146,7 +148,7 @@ namespace BizHawk.Client.EmuHawk
 				_settings.BackgroundColor &= 0x00FFFFFF;
 			}
 
-			_nes.PutSettings(_settings);
+			Emulator.PutSettings(_settings);
 			Close();
 		}
 
