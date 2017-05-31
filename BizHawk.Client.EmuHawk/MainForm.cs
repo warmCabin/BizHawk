@@ -322,7 +322,7 @@ namespace BizHawk.Client.EmuHawk
 			GlobalWin.Sound.StartSound();
 			InputManager.RewireInputChain();
 			GlobalWin.Tools = new ToolManager(this);
-			_configManager = new ConfigManager(this, Global.Config);
+			_configManager = new ConfigManager(this);
 			RewireSound();
 
 			// Workaround for windows, location is -32000 when minimized, if they close it during this time, that's what gets saved
@@ -735,8 +735,9 @@ namespace BizHawk.Client.EmuHawk
 			return false;
 		}
 
-		// TODO: make this an actual property, set it when loading a Rom, and pass it dialogs, etc
-		// This is a quick hack to reduce the dependency on Global.Emulator
+		// ***********************************************
+		// TODO: make these actual properties, set it when loading a Rom, and pass it dialogs, etc
+		// This is a quick hack to reduce the dependency on Global
 		internal IEmulator Emulator
 		{
 			get
@@ -752,6 +753,11 @@ namespace BizHawk.Client.EmuHawk
 			}
 		}
 
+		internal Config Config => Global.Config;
+
+		internal GameInfo Game => Global.Game;
+
+		// ***********************************************
 		private IVideoProvider _currentVideoProvider = NullVideo.Instance;
 
 		private ISoundProvider _currentSoundProvider = new NullSound(44100 / 60); // Reasonable default until we have a core instance
@@ -1027,7 +1033,7 @@ namespace BizHawk.Client.EmuHawk
 			using (var fs = new FileStream(path + "_test.bmp", FileMode.OpenOrCreate, FileAccess.Write))
 				QuickBmpFile.Save(Emulator.VideoProvider(), fs, r.Next(50, 500), r.Next(50, 500));
 			*/
-			GlobalWin.OSD.AddMessage(fi.Name + " saved.");
+		GlobalWin.OSD.AddMessage(fi.Name + " saved.");
 		}
 
 		public void FrameBufferResized()

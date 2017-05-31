@@ -4,14 +4,17 @@ using System.Windows.Forms;
 
 using BizHawk.Common.StringExtensions;
 using BizHawk.Common.ReflectionExtensions;
+using BizHawk.Emulation.Common;
 using BizHawk.Emulation.Cores.Nintendo.N64;
-using BizHawk.Client.Common;
 using BizHawk.Client.EmuHawk.WinFormExtensions;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public partial class N64VideoPluginconfig : Form
+	public partial class N64VideoPluginconfig : ConfigForm
 	{
+		[RequiredService]
+		private IEmulator Emulator { get; set; }
+
 		private N64Settings _s;
 		private N64SyncSettings _ss;
 
@@ -57,49 +60,49 @@ namespace BizHawk.Client.EmuHawk
 		}
 
 		// because mupen is a pile of garbage, this all needs to work even when N64 is not loaded
-		private static N64SyncSettings GetSyncSettings()
+		private N64SyncSettings GetSyncSettings()
 		{
-			if (Global.Emulator is N64)
+			if (Emulator is N64)
 			{
-				return ((N64)Global.Emulator).GetSyncSettings();
+				return ((N64)Emulator).GetSyncSettings();
 			}
 
-			return (N64SyncSettings)Global.Config.GetCoreSyncSettings<N64>()
+			return (N64SyncSettings)Config.GetCoreSyncSettings<N64>()
 				?? new N64SyncSettings();
 		}
 
-		private static N64Settings GetSettings()
+		private N64Settings GetSettings()
 		{
-			if (Global.Emulator is N64)
+			if (Emulator is N64)
 			{
-				return ((N64)Global.Emulator).GetSettings();
+				return ((N64)Emulator).GetSettings();
 			}
 
-			return (N64Settings)Global.Config.GetCoreSettings<N64>()
+			return (N64Settings)Config.GetCoreSettings<N64>()
 				?? new N64Settings();
 		}
 
-		private static void PutSyncSettings(N64SyncSettings s)
+		private void PutSyncSettings(N64SyncSettings s)
 		{
-			if (Global.Emulator is N64)
+			if (Emulator is N64)
 			{
-				GlobalWin.MainForm.PutCoreSyncSettings(s);
+				MainForm.PutCoreSyncSettings(s);
 			}
 			else
 			{
-				Global.Config.PutCoreSyncSettings<N64>(s);
+				Config.PutCoreSyncSettings<N64>(s);
 			}
 		}
 
-		private static void PutSettings(N64Settings s)
+		private void PutSettings(N64Settings s)
 		{
-			if (Global.Emulator is N64)
+			if (Emulator is N64)
 			{
-				GlobalWin.MainForm.PutCoreSettings(s);
+				MainForm.PutCoreSettings(s);
 			}
 			else
 			{
-				Global.Config.PutCoreSettings<N64>(s);
+				Config.PutCoreSettings<N64>(s);
 			}
 		}
 
@@ -884,43 +887,43 @@ namespace BizHawk.Client.EmuHawk
 		{
 			if (Glide64mk2_UseDefaultHacks1.Checked || Glide64mk2_UseDefaultHacks2.Checked)
 			{
-				Glide64mk2_use_sts1_only.Checked = Global.Game.GetBool("Glide64mk2_use_sts1_only", false);
-				Glide64mk2_optimize_texrect.Checked = Global.Game.GetBool("Glide64mk2_optimize_texrect", true);
-				Glide64mk2_increase_texrect_edge.Checked = Global.Game.GetBool("Glide64mk2_increase_texrect_edge", false);
-				Glide64mk2_ignore_aux_copy.Checked = Global.Game.GetBool("Glide64mk2_ignore_aux_copy", false);
-				Glide64mk2_hires_buf_clear.Checked = Global.Game.GetBool("Glide64mk2_hires_buf_clear", true);
-				Glide64mk2_force_microcheck.Checked = Global.Game.GetBool("Glide64mk2_force_microcheck", false);
-				Glide64mk2_fog.Checked = Global.Game.GetBool("Glide64mk2_fog", true);
-				Glide64mk2_fb_smart.Checked = Global.Game.GetBool("Glide64mk2_fb_smart", false);
-				Glide64mk2_fb_read_alpha.Checked = Global.Game.GetBool("Glide64mk2_fb_read_alpha", false);
-				Glide64mk2_fb_hires.Checked = Global.Game.GetBool("Glide64mk2_fb_hires", true);
-				Glide64mk2_detect_cpu_write.Checked = Global.Game.GetBool("Glide64mk2_detect_cpu_write", false);
-				Glide64mk2_decrease_fillrect_edge.Checked = Global.Game.GetBool("Glide64mk2_decrease_fillrect_edge", false);
-				Glide64mk2_buff_clear.Checked = Global.Game.GetBool("Glide64mk2_buff_clear", true);
-				Glide64mk2_alt_tex_size.Checked = Global.Game.GetBool("Glide64mk2_alt_tex_size", true);
-				Glide64mk2_swapmode.SelectedIndex = Global.Game.GetInt("Glide64mk2_swapmode", 1);
-				Glide64mk2_stipple_pattern.Text = Global.Game.GetInt("Glide64mk2_stipple_pattern", 1041204192).ToString();
-				Glide64mk2_stipple_mode.Text = Global.Game.GetInt("Glide64mk2_stipple_mode", 2).ToString();
-				Glide64mk2_lodmode.SelectedIndex = Global.Game.GetInt("Glide64mk2_lodmode", 0);
-				Glide64mk2_filtering.SelectedIndex = Global.Game.GetInt("Glide64mk2_filtering", 0);
-				Glide64mk2_correct_viewport.Checked = Global.Game.GetBool("Glide64mk2_correct_viewport", false);
-				Glide64mk2_force_calc_sphere.Checked = Global.Game.GetBool("Glide64mk2_force_calc_sphere", false);
-				Glide64mk2_pal230.Checked = Global.Game.GetBool("Glide64mk2_pal230", false);
-				Glide64mk2_texture_correction.Checked = Global.Game.GetBool("Glide64mk2_texture_correction", true);
-				Glide64mk2_n64_z_scale.Checked = Global.Game.GetBool("Glide64mk2_n64_z_scale", false);
-				Glide64mk2_old_style_adither.Checked = Global.Game.GetBool("Glide64mk2_old_style_adither", false);
-				Glide64mk2_zmode_compare_less.Checked = Global.Game.GetBool("Glide64mk2_zmode_compare_less", false);
-				Glide64mk2_adjust_aspect.Checked = Global.Game.GetBool("Glide64mk2_adjust_aspect", true);
-				Glide64mk2_clip_zmax.Checked = Global.Game.GetBool("Glide64mk2_clip_zmax", true);
-				Glide64mk2_clip_zmin.Checked = Global.Game.GetBool("Glide64mk2_clip_zmin", false);
-				Glide64mk2_force_quad3d.Checked = Global.Game.GetBool("Glide64mk2_force_quad3d", false);
-				Glide64mk2_useless_is_useless.Checked = Global.Game.GetBool("Glide64mk2_useless_is_useless", false);
-				Glide64mk2_fb_read_always.Checked = Global.Game.GetBool("Glide64mk2_fb_read_always", false);
-				Glide64mk2_aspectmode.SelectedIndex = Global.Game.GetInt("Glide64mk2_aspectmode", 0);
-				Glide64mk2_fb_crc_mode.SelectedIndex = Global.Game.GetInt("Glide64mk2_fb_crc_mode", 1);
-				Glide64mk2_enable_hacks_for_game.SelectedIndex = Global.Game.GetInt("Glide64mk2_enable_hacks_for_game", 0);
-				Glide64mk2_read_back_to_screen.SelectedIndex = Global.Game.GetInt("Glide64mk2_read_back_to_screen", 0);
-				Glide64mk2_fast_crc.Checked = Global.Game.GetBool("Glide64mk2_fast_crc", true);
+				Glide64mk2_use_sts1_only.Checked = Game.GetBool("Glide64mk2_use_sts1_only", false);
+				Glide64mk2_optimize_texrect.Checked = Game.GetBool("Glide64mk2_optimize_texrect", true);
+				Glide64mk2_increase_texrect_edge.Checked = Game.GetBool("Glide64mk2_increase_texrect_edge", false);
+				Glide64mk2_ignore_aux_copy.Checked = Game.GetBool("Glide64mk2_ignore_aux_copy", false);
+				Glide64mk2_hires_buf_clear.Checked = Game.GetBool("Glide64mk2_hires_buf_clear", true);
+				Glide64mk2_force_microcheck.Checked = Game.GetBool("Glide64mk2_force_microcheck", false);
+				Glide64mk2_fog.Checked = Game.GetBool("Glide64mk2_fog", true);
+				Glide64mk2_fb_smart.Checked = Game.GetBool("Glide64mk2_fb_smart", false);
+				Glide64mk2_fb_read_alpha.Checked = Game.GetBool("Glide64mk2_fb_read_alpha", false);
+				Glide64mk2_fb_hires.Checked = Game.GetBool("Glide64mk2_fb_hires", true);
+				Glide64mk2_detect_cpu_write.Checked = Game.GetBool("Glide64mk2_detect_cpu_write", false);
+				Glide64mk2_decrease_fillrect_edge.Checked = Game.GetBool("Glide64mk2_decrease_fillrect_edge", false);
+				Glide64mk2_buff_clear.Checked = Game.GetBool("Glide64mk2_buff_clear", true);
+				Glide64mk2_alt_tex_size.Checked = Game.GetBool("Glide64mk2_alt_tex_size", true);
+				Glide64mk2_swapmode.SelectedIndex = Game.GetInt("Glide64mk2_swapmode", 1);
+				Glide64mk2_stipple_pattern.Text = Game.GetInt("Glide64mk2_stipple_pattern", 1041204192).ToString();
+				Glide64mk2_stipple_mode.Text = Game.GetInt("Glide64mk2_stipple_mode", 2).ToString();
+				Glide64mk2_lodmode.SelectedIndex = Game.GetInt("Glide64mk2_lodmode", 0);
+				Glide64mk2_filtering.SelectedIndex = Game.GetInt("Glide64mk2_filtering", 0);
+				Glide64mk2_correct_viewport.Checked = Game.GetBool("Glide64mk2_correct_viewport", false);
+				Glide64mk2_force_calc_sphere.Checked = Game.GetBool("Glide64mk2_force_calc_sphere", false);
+				Glide64mk2_pal230.Checked = Game.GetBool("Glide64mk2_pal230", false);
+				Glide64mk2_texture_correction.Checked = Game.GetBool("Glide64mk2_texture_correction", true);
+				Glide64mk2_n64_z_scale.Checked = Game.GetBool("Glide64mk2_n64_z_scale", false);
+				Glide64mk2_old_style_adither.Checked = Game.GetBool("Glide64mk2_old_style_adither", false);
+				Glide64mk2_zmode_compare_less.Checked = Game.GetBool("Glide64mk2_zmode_compare_less", false);
+				Glide64mk2_adjust_aspect.Checked = Game.GetBool("Glide64mk2_adjust_aspect", true);
+				Glide64mk2_clip_zmax.Checked = Game.GetBool("Glide64mk2_clip_zmax", true);
+				Glide64mk2_clip_zmin.Checked = Game.GetBool("Glide64mk2_clip_zmin", false);
+				Glide64mk2_force_quad3d.Checked = Game.GetBool("Glide64mk2_force_quad3d", false);
+				Glide64mk2_useless_is_useless.Checked = Game.GetBool("Glide64mk2_useless_is_useless", false);
+				Glide64mk2_fb_read_always.Checked = Game.GetBool("Glide64mk2_fb_read_always", false);
+				Glide64mk2_aspectmode.SelectedIndex = Game.GetInt("Glide64mk2_aspectmode", 0);
+				Glide64mk2_fb_crc_mode.SelectedIndex = Game.GetInt("Glide64mk2_fb_crc_mode", 1);
+				Glide64mk2_enable_hacks_for_game.SelectedIndex = Game.GetInt("Glide64mk2_enable_hacks_for_game", 0);
+				Glide64mk2_read_back_to_screen.SelectedIndex = Game.GetInt("Glide64mk2_read_back_to_screen", 0);
+				Glide64mk2_fast_crc.Checked = Game.GetBool("Glide64mk2_fast_crc", true);
 
 				ToggleGlide64mk2HackCheckboxEnable(false);
 			}
@@ -934,11 +937,11 @@ namespace BizHawk.Client.EmuHawk
 		{
 			if (GLideN64_UseDefaultHacks.Checked)
 			{
-				GLideN64_EnableN64DepthCompare.Checked = Global.Game.GetBool("GLideN64_N64DepthCompare", false);
+				GLideN64_EnableN64DepthCompare.Checked = Game.GetBool("GLideN64_N64DepthCompare", false);
 				GLideN64_EnableCopyColorToRDRAM.SelectedItem = ((N64SyncSettings.N64GLideN64PluginSettings.CopyColorToRDRAMMode)GetIntFromDB("GLideN64_CopyColorToRDRAM", (int)N64SyncSettings.N64GLideN64PluginSettings.CopyColorToRDRAMMode.AsyncMode)).GetDescription();
 				GLideN64_EnableCopyDepthToRDRAM.SelectedItem = ((N64SyncSettings.N64GLideN64PluginSettings.CopyDepthToRDRAMMode)GetIntFromDB("GLideN64_CopyDepthToRDRAM", (int)N64SyncSettings.N64GLideN64PluginSettings.CopyDepthToRDRAMMode.DoNotCopy)).GetDescription();
-				GLideN64_EnableCopyColorFromRDRAM.Checked = Global.Game.GetBool("GLideN64_CopyColorFromRDRAM", false);
-				GLideN64_EnableCopyAuxiliaryToRDRAM.Checked = Global.Game.GetBool("GLideN64_CopyAuxiliaryToRDRAM", false);
+				GLideN64_EnableCopyColorFromRDRAM.Checked = Game.GetBool("GLideN64_CopyColorFromRDRAM", false);
+				GLideN64_EnableCopyAuxiliaryToRDRAM.Checked = Game.GetBool("GLideN64_CopyAuxiliaryToRDRAM", false);
 
 				ToggleGLideN64HackCheckboxEnable(false);
 			}
@@ -953,39 +956,39 @@ namespace BizHawk.Client.EmuHawk
 		{
 			if (GlideUseDefaultHacks1.Checked || GlideUseDefaultHacks2.Checked)
 			{
-				Glide_alt_tex_size.Checked = Global.Game.GetBool("Glide_alt_tex_size", false);
-				Glide_buff_clear.Checked = Global.Game.GetBool("Glide_buff_clear", true);
-				Glide_decrease_fillrect_edge.Checked = Global.Game.GetBool("Glide_decrease_fillrect_edge", false);
-				Glide_detect_cpu_write.Checked = Global.Game.GetBool("Glide_detect_cpu_write", false);
-				Glide_fb_clear.Checked = Global.Game.GetBool("Glide_fb_clear", false);
-				Glide_fb_hires.Checked = Global.Game.GetBool("Glide_fb_hires", true);
-				Glide_fb_read_alpha.Checked = Global.Game.GetBool("Glide_fb_read_alpha", false);
-				Glide_fb_smart.Checked = Global.Game.GetBool("Glide_fb_smart", false);
-				Glide_fillcolor_fix.Checked = Global.Game.GetBool("Glide_fillcolor_fix", false);
-				Glide_fog.Checked = Global.Game.GetBool("Glide_fog", true);
-				Glide_force_depth_compare.Checked = Global.Game.GetBool("Glide_force_depth_compare", false);
-				Glide_force_microcheck.Checked = Global.Game.GetBool("Glide_force_microcheck", false);
-				Glide_fb_hires_buf_clear.Checked = Global.Game.GetBool("Glide_fb_hires_buf_clear", true);
-				Glide_fb_ignore_aux_copy.Checked = Global.Game.GetBool("Glide_fb_ignore_aux_copy", false);
-				Glide_fb_ignore_previous.Checked = Global.Game.GetBool("Glide_fb_ignore_previous", false);
-				Glide_increase_primdepth.Checked = Global.Game.GetBool("Glide_increase_primdepth", false);
-				Glide_increase_texrect_edge.Checked = Global.Game.GetBool("Glide_increase_texrect_edge", false);
-				Glide_fb_optimize_texrect.Checked = Global.Game.GetBool("Glide_fb_optimize_texrect", true);
-				Glide_fb_optimize_write.Checked = Global.Game.GetBool("Glide_fb_optimize_write", false);
-				Glide_PPL.Checked = Global.Game.GetBool("Glide_PPL", false);
-				Glide_soft_depth_compare.Checked = Global.Game.GetBool("Glide_soft_depth_compare", false);
-				Glide_use_sts1_only.Checked = Global.Game.GetBool("Glide_use_sts1_only", false);
-				Glide_wrap_big_tex.Checked = Global.Game.GetBool("Glide_wrap_big_tex", false);
+				Glide_alt_tex_size.Checked = Game.GetBool("Glide_alt_tex_size", false);
+				Glide_buff_clear.Checked = Game.GetBool("Glide_buff_clear", true);
+				Glide_decrease_fillrect_edge.Checked = Game.GetBool("Glide_decrease_fillrect_edge", false);
+				Glide_detect_cpu_write.Checked = Game.GetBool("Glide_detect_cpu_write", false);
+				Glide_fb_clear.Checked = Game.GetBool("Glide_fb_clear", false);
+				Glide_fb_hires.Checked = Game.GetBool("Glide_fb_hires", true);
+				Glide_fb_read_alpha.Checked = Game.GetBool("Glide_fb_read_alpha", false);
+				Glide_fb_smart.Checked = Game.GetBool("Glide_fb_smart", false);
+				Glide_fillcolor_fix.Checked = Game.GetBool("Glide_fillcolor_fix", false);
+				Glide_fog.Checked = Game.GetBool("Glide_fog", true);
+				Glide_force_depth_compare.Checked = Game.GetBool("Glide_force_depth_compare", false);
+				Glide_force_microcheck.Checked = Game.GetBool("Glide_force_microcheck", false);
+				Glide_fb_hires_buf_clear.Checked = Game.GetBool("Glide_fb_hires_buf_clear", true);
+				Glide_fb_ignore_aux_copy.Checked = Game.GetBool("Glide_fb_ignore_aux_copy", false);
+				Glide_fb_ignore_previous.Checked = Game.GetBool("Glide_fb_ignore_previous", false);
+				Glide_increase_primdepth.Checked = Game.GetBool("Glide_increase_primdepth", false);
+				Glide_increase_texrect_edge.Checked = Game.GetBool("Glide_increase_texrect_edge", false);
+				Glide_fb_optimize_texrect.Checked = Game.GetBool("Glide_fb_optimize_texrect", true);
+				Glide_fb_optimize_write.Checked = Game.GetBool("Glide_fb_optimize_write", false);
+				Glide_PPL.Checked = Game.GetBool("Glide_PPL", false);
+				Glide_soft_depth_compare.Checked = Game.GetBool("Glide_soft_depth_compare", false);
+				Glide_use_sts1_only.Checked = Game.GetBool("Glide_use_sts1_only", false);
+				Glide_wrap_big_tex.Checked = Game.GetBool("Glide_wrap_big_tex", false);
 
-				Glide_depth_bias.Text = Global.Game.GetInt("Glide_depth_bias", 20).ToString();
-				Glide_filtering.SelectedIndex = Global.Game.GetInt("Glide_filtering", 1);
-				Glide_fix_tex_coord.Text = Global.Game.GetInt("Glide_fix_tex_coord", 0).ToString();
-				Glide_lodmode.SelectedIndex = Global.Game.GetInt("Glide_lodmode", 0);
+				Glide_depth_bias.Text = Game.GetInt("Glide_depth_bias", 20).ToString();
+				Glide_filtering.SelectedIndex = Game.GetInt("Glide_filtering", 1);
+				Glide_fix_tex_coord.Text = Game.GetInt("Glide_fix_tex_coord", 0).ToString();
+				Glide_lodmode.SelectedIndex = Game.GetInt("Glide_lodmode", 0);
 
-				Glide_stipple_mode.Text = Global.Game.GetInt("Glide_stipple_mode", 2).ToString();
-				Glide_stipple_pattern.Text = Global.Game.GetInt("Glide_stipple_pattern", 1041204192).ToString();
-				Glide_swapmode.SelectedIndex = Global.Game.GetInt("Glide_swapmode", 1);
-				Glide_enable_hacks_for_game.SelectedIndex = Global.Game.GetInt("Glide_enable_hacks_for_game", 0);
+				Glide_stipple_mode.Text = Game.GetInt("Glide_stipple_mode", 2).ToString();
+				Glide_stipple_pattern.Text = Game.GetInt("Glide_stipple_pattern", 1041204192).ToString();
+				Glide_swapmode.SelectedIndex = Game.GetInt("Glide_swapmode", 1);
+				Glide_enable_hacks_for_game.SelectedIndex = Game.GetInt("Glide_enable_hacks_for_game", 0);
 				
 				ToggleGlideHackCheckboxEnable(false);
 			}
@@ -1037,14 +1040,14 @@ namespace BizHawk.Client.EmuHawk
 
 		private bool GetBoolFromDB(string parameter)
 		{
-			return Global.Game.OptionPresent(parameter) && Global.Game.OptionValue(parameter) == "true";
+			return Game.OptionPresent(parameter) && Game.OptionValue(parameter) == "true";
 		}
 
 		private int GetIntFromDB(string parameter, int defaultVal)
 		{
-			if (Global.Game.OptionPresent(parameter) && Global.Game.OptionValue(parameter).IsUnsigned())
+			if (Game.OptionPresent(parameter) && Game.OptionValue(parameter).IsUnsigned())
 			{
-				return int.Parse(Global.Game.OptionValue(parameter));
+				return int.Parse(Game.OptionValue(parameter));
 			}
 
 			return defaultVal;

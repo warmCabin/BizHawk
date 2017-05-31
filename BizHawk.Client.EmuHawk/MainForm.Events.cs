@@ -2230,7 +2230,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void N64PluginSettingsMenuItem_Click(object sender, EventArgs e)
 		{
-			if (new N64VideoPluginconfig().ShowDialog() == DialogResult.OK)
+			if (_configManager.ShowDialog<N64VideoPluginconfig>() == DialogResult.OK)
 			{
 				if (Emulator.IsNull())
 				{

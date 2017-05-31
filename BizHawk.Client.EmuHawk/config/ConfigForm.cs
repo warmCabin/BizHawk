@@ -1,4 +1,6 @@
 ﻿using System.Windows.Forms;
+
+using BizHawk.Emulation.Common;
 using BizHawk.Client.Common;
 
 namespace BizHawk.Client.EmuHawk
@@ -7,5 +9,6 @@ namespace BizHawk.Client.EmuHawk
 	{
 		public MainForm MainForm { get; set; }
 		public Config Config { get; set; }
+		public GameInfo Game { get; set; }
 	}
 }

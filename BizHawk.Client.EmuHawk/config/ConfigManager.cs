@@ -15,12 +15,10 @@ namespace BizHawk.Client.EmuHawk
 	public class ConfigManager
 	{
 		private readonly MainForm _mainForm;
-		private readonly Config _config;
 
-		public ConfigManager(MainForm mainForm, Config config)
+		public ConfigManager(MainForm mainForm)
 		{
 			_mainForm = mainForm;
-			_config = config;
 		}
 
 		public bool IsAvailable<T>()
@@ -63,8 +61,8 @@ namespace BizHawk.Client.EmuHawk
 
 			newDialog.Owner = _mainForm;
 			newDialog.MainForm = _mainForm;
-			newDialog.Config = _config;
-
+			newDialog.Config = _mainForm.Config;
+			newDialog.Game = _mainForm.Game;
 			var dialogResult = newDialog.ShowDialog();
 
 			return dialogResult;
