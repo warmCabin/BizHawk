@@ -2249,7 +2249,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void N64ControllerSettingsMenuItem_Click(object sender, EventArgs e)
 		{
-			if (new N64ControllersSetup().ShowDialog() == DialogResult.OK)
+			if (_configManager.ShowDialog<N64ControllersSetup>() == DialogResult.OK)
 			{
 				FlagNeedsReboot();
 				GlobalWin.OSD.AddMessage("Controller settings saved but a core reboot is required");

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Windows.Forms;
 
 using BizHawk.Emulation.Common;
 using BizHawk.Client.Common;
@@ -48,7 +49,7 @@ namespace BizHawk.Client.EmuHawk
 			return true;
 		}
 
-		public T ShowDialog<T>()
+		public DialogResult ShowDialog<T>()
 			where T : ConfigForm
 		{
 			T newDialog = Activator.CreateInstance<T>();
@@ -64,9 +65,9 @@ namespace BizHawk.Client.EmuHawk
 			newDialog.MainForm = _mainForm;
 			newDialog.Config = _config;
 
-			newDialog.ShowDialog();
+			var dialogResult = newDialog.ShowDialog();
 
-			return newDialog;
+			return dialogResult;
 		}
 	}
 }

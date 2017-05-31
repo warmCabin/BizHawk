@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
+using BizHawk.Emulation.Common;
 using BizHawk.Emulation.Cores.Nintendo.N64;
-using BizHawk.Client.Common;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public partial class N64ControllersSetup : Form
+	public partial class N64ControllersSetup : ConfigForm
 	{
+		[RequiredService]
+		private N64 Core { get; set; }
+
 		private List<N64ControllerSettingControl> ControllerSettingControls
 		{
 			get
@@ -28,7 +31,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void N64ControllersSetup_Load(object sender, EventArgs e)
 		{
-			var n64Settings = ((N64)Global.Emulator).GetSyncSettings();
+			var n64Settings = Core.GetSyncSettings();
 			
 			ControllerSettingControls
 				.ForEach(c =>
@@ -41,8 +44,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void OkBtn_Click(object sender, EventArgs e)
 		{
-			var n64 = (N64)Global.Emulator;
-			var n64Settings = n64.GetSyncSettings();
+			var n64Settings = Core.GetSyncSettings();
 			
 			ControllerSettingControls
 				.ForEach(c =>
@@ -51,7 +53,7 @@ namespace BizHawk.Client.EmuHawk
 					n64Settings.Controllers[c.ControllerNumber - 1].PakType = c.PakType;
 				});
 
-			n64.PutSyncSettings(n64Settings);
+			Core.PutSyncSettings(n64Settings);
 
 			DialogResult = DialogResult.OK;
 			Close();
