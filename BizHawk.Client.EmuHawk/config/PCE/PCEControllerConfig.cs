@@ -3,13 +3,16 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
+using BizHawk.Emulation.Common;
 using BizHawk.Emulation.Cores.PCEngine;
-using BizHawk.Client.Common;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public partial class PCEControllerConfig : Form
+	public partial class PCEControllerConfig : ConfigForm
 	{
+		[RequiredService]
+		private PCEngine Pce { get; set; }
+
 		public PCEControllerConfig()
 		{
 			InitializeComponent();
@@ -17,7 +20,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void PCEControllerConfig_Load(object sender, EventArgs e)
 		{
-			var pceSettings = ((PCEngine)Global.Emulator).GetSyncSettings();
+			var pceSettings = Pce.GetSyncSettings();
 			for (int i = 0; i < 5; i++)
 			{
 				Controls.Add(new Label
@@ -37,7 +40,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void OkBtn_Click(object sender, EventArgs e)
 		{
-			var pceSettings = ((PCEngine)Global.Emulator).GetSyncSettings();
+			var pceSettings = Pce.GetSyncSettings();
 
 			Controls
 				.OfType<CheckBox>()
@@ -48,7 +51,7 @@ namespace BizHawk.Client.EmuHawk
 					var index = int.Parse(c.Name.Replace("Controller", ""));
 					pceSettings.Controllers[index].IsConnected = c.Checked;
 				});
-			GlobalWin.MainForm.PutCoreSyncSettings(pceSettings);
+			MainForm.PutCoreSyncSettings(pceSettings);
 			DialogResult = DialogResult.OK;
 			Close();
 		}

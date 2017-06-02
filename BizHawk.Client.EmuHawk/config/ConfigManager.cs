@@ -46,26 +46,27 @@ namespace BizHawk.Client.EmuHawk
 		public DialogResult ShowDialog<T>()
 			where T : ConfigForm
 		{
-			T newDialog = Activator.CreateInstance<T>();
-
-			var result = ServiceInjector.UpdateServices(_mainForm.Emulator.ServiceProvider, newDialog);
-
-			if (!result)
+			using (T newDialog = Activator.CreateInstance<T>())
 			{
-				throw new InvalidOperationException("Current core can not provide all the required dependencies");
+				var result = ServiceInjector.UpdateServices(_mainForm.Emulator.ServiceProvider, newDialog);
+
+				if (!result)
+				{
+					throw new InvalidOperationException("Current core can not provide all the required dependencies");
+				}
+
+				newDialog.Owner = _mainForm;
+				newDialog.MainForm = _mainForm;
+				newDialog.Config = _mainForm.Config;
+				newDialog.Game = _mainForm.Game;
+				newDialog.OSD = _mainForm.OSD;
+
+				_mainForm.Sound.StopSound();
+				var dialogResult = newDialog.ShowDialog();
+				_mainForm.Sound.StartSound();
+
+				return dialogResult;
 			}
-
-			newDialog.Owner = _mainForm;
-			newDialog.MainForm = _mainForm;
-			newDialog.Config = _mainForm.Config;
-			newDialog.Game = _mainForm.Game;
-			newDialog.OSD = _mainForm.OSD;
-
-			_mainForm.Sound.StopSound();
-			var dialogResult = newDialog.ShowDialog();
-			_mainForm.Sound.StartSound();
-
-			return dialogResult;
 		}
 	}
 }

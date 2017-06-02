@@ -1701,15 +1701,12 @@ namespace BizHawk.Client.EmuHawk
 
 		private void PceControllerSettingsMenuItem_Click(object sender, EventArgs e)
 		{
-			using (var dlg = new PCEControllerConfig())
-			{
-				dlg.ShowDialog();
-			}
+			_configManager.ShowDialog<PCEControllerConfig>();
 		}
 
 		private void PceGraphicsSettingsMenuItem_Click(object sender, EventArgs e)
 		{
-			new PCEGraphicsConfig().ShowDialog();
+			_configManager.ShowDialog<PCEGraphicsConfig>();
 		}
 
 		private void PceBgViewerMenuItem_Click(object sender, EventArgs e)
