@@ -1597,7 +1597,7 @@ namespace BizHawk.Client.EmuHawk
 			}
 			else if (Emulator is QuickNES)
 			{
-				new QuickNesConfig().ShowDialog(this);
+				_configManager.ShowDialog<QuickNesConfig>();
 			}
 		}
 
@@ -1676,10 +1676,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void MovieSettingsMenuItem_Click(object sender, EventArgs e)
 		{
-			using (var dlg = new NESSyncSettingsForm())
-			{
-				dlg.ShowDialog(this);
-			}
+			_configManager.ShowDialog<NESSyncSettingsForm>();
 		}
 
 		private void BarcodeReaderMenuItem_Click(object sender, EventArgs e)

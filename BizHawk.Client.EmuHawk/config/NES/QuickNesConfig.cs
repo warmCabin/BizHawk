@@ -2,14 +2,19 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-using BizHawk.Emulation.Cores.Consoles.Nintendo.QuickNES;
-using BizHawk.Client.Common;
 using BizHawk.Common;
+using BizHawk.Emulation.Common;
+using BizHawk.Emulation.Cores.Consoles.Nintendo.QuickNES;
+using BizHawk.Emulation.Cores.Nintendo.NES;
+using BizHawk.Client.Common;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public partial class QuickNesConfig : Form
+	public partial class QuickNesConfig : ConfigForm
 	{
+		[RequiredService]
+		private QuickNES Nes { get; set; }
+
 		private QuickNES.QuickNESSettings _settings;
 
 		public QuickNesConfig()
@@ -19,7 +24,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void QuickNesConfig_Load(object sender, EventArgs e)
 		{
-			_settings = ((QuickNES)Global.Emulator).GetSettings();
+			_settings = Nes.GetSettings();
 			propertyGrid1.SelectedObject = _settings;
 			SetPaletteImage();
 		}
@@ -89,7 +94,7 @@ namespace BizHawk.Client.EmuHawk
 
 			if (palette.Exists)
 			{
-				var data = Emulation.Cores.Nintendo.NES.Palettes.Load_FCEUX_Palette(HawkFile.ReadAllBytes(palette.Name));
+				var data = Palettes.Load_FCEUX_Palette(HawkFile.ReadAllBytes(palette.Name));
 				_settings.SetNesHawkPalette(data);
 				SetPaletteImage();
 			}
@@ -97,7 +102,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void ButtonOk_Click(object sender, EventArgs e)
 		{
-			GlobalWin.MainForm.PutCoreSettings(_settings);
+			MainForm.PutCoreSettings(_settings);
 			DialogResult = DialogResult.OK;
 			Close();
 		}

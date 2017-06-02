@@ -759,6 +759,8 @@ namespace BizHawk.Client.EmuHawk
 
 		internal OSDManager OSD => GlobalWin.OSD;
 
+		internal Sound Sound => GlobalWin.Sound;
+
 		// ***********************************************
 		private IVideoProvider _currentVideoProvider = NullVideo.Instance;
 

@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Windows.Forms;
 
-using BizHawk.Client.Common;
+using BizHawk.Emulation.Common;
 using BizHawk.Emulation.Cores.Nintendo.NES;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public partial class NesVsSettings : Form
+	public partial class NesVsSettings : ConfigForm
 	{
+		[RequiredService]
+		private NES Nes { get; set; }
+
 		private NES.NESSyncSettings _settings;
-		private NES _nes;
 
 		public NesVsSettings()
 		{
@@ -18,8 +19,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void NesVsSettings_Load(object sender, EventArgs e)
 		{
-			_nes = (NES)Global.Emulator;
-			_settings = _nes.GetSyncSettings();
+			_settings = Nes.GetSyncSettings();
 
 			Dipswitch1CheckBox.Checked = _settings.VSDipswitches.Dip_Switch_1;
 			Dipswitch2CheckBox.Checked = _settings.VSDipswitches.Dip_Switch_2;
@@ -42,7 +42,7 @@ namespace BizHawk.Client.EmuHawk
 			_settings.VSDipswitches.Dip_Switch_7 = Dipswitch7CheckBox.Checked;
 			_settings.VSDipswitches.Dip_Switch_8 = Dipswitch8CheckBox.Checked;
 
-			var changes = _nes.PutSyncSettings(_settings);
+			var changes = Nes.PutSyncSettings(_settings);
 
 			if (changes)
 			{

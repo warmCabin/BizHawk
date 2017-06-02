@@ -4,24 +4,30 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-using BizHawk.Client.Common;
 using BizHawk.Emulation.Cores.Nintendo.NES;
 using BizHawk.Common.NumberExtensions;
+using BizHawk.Emulation.Common;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public partial class NESSyncSettingsForm : Form
+	public partial class NESSyncSettingsForm : ConfigForm
 	{
-		private readonly DataTableDictionaryBind<string, string> _dataTableDictionary;
-		private readonly NES.NESSyncSettings _syncSettings;
+		[RequiredService]
+		private NES Nes { get; set; }
+
+		private DataTableDictionaryBind<string, string> _dataTableDictionary;
+		private NES.NESSyncSettings _syncSettings;
 
 		public NESSyncSettingsForm()
 		{
 			InitializeComponent();
+		}
 
-			_syncSettings = ((NES)Global.Emulator).GetSyncSettings();
+		private void NESSyncSettingsForm_Load(object sender, EventArgs e)
+		{
+			_syncSettings = Nes.GetSyncSettings();
 
-			if (((NES)Global.Emulator).HasMapperProperties)
+			if (Nes.HasMapperProperties)
 			{
 				_dataTableDictionary = new DataTableDictionaryBind<string, string>(_syncSettings.BoardProperties);
 				dataGridView1.DataSource = _dataTableDictionary.Table;

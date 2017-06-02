@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Windows.Forms;
 
 using BizHawk.Emulation.Common;
-using BizHawk.Client.Common;
+using BizHawk.Client.EmuHawk.WinFormExtensions;
 
 namespace BizHawk.Client.EmuHawk
 {
@@ -60,7 +60,10 @@ namespace BizHawk.Client.EmuHawk
 			newDialog.Config = _mainForm.Config;
 			newDialog.Game = _mainForm.Game;
 			newDialog.OSD = _mainForm.OSD;
+
+			_mainForm.Sound.StopSound();
 			var dialogResult = newDialog.ShowDialog();
+			_mainForm.Sound.StartSound();
 
 			return dialogResult;
 		}
