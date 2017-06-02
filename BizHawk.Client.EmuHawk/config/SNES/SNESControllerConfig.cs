@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Windows.Forms;
 
+using BizHawk.Emulation.Common;
 using BizHawk.Emulation.Cores.Nintendo.SNES;
-using BizHawk.Client.Common;
 using BizHawk.Client.EmuHawk.WinFormExtensions;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public partial class SNESControllerSettings : Form
+	public partial class SNESControllerSettings : ConfigForm
 	{
+		[RequiredService]
+		private LibsnesCore Snes { get; set; }
+
 		private LibsnesCore.SnesSyncSettings _syncSettings;
 		private bool _supressDropdownChangeEvents;
 
@@ -19,7 +22,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void SNESControllerSettings_Load(object sender, EventArgs e)
 		{
-			_syncSettings = ((LibsnesCore)Global.Emulator).GetSyncSettings().Clone();
+			_syncSettings = Snes.GetSyncSettings().Clone();
 
 			LimitAnalogChangeCheckBox.Checked = _syncSettings.LimitAnalogChangeSensitivity;
 
@@ -42,7 +45,7 @@ namespace BizHawk.Client.EmuHawk
 				_syncSettings.RightPort = (LibsnesControllerDeck.ControllerType)Enum.Parse(typeof(LibsnesControllerDeck.ControllerType), Port2ComboBox.SelectedItem.ToString());
 				_syncSettings.LimitAnalogChangeSensitivity = LimitAnalogChangeCheckBox.Checked;
 
-				GlobalWin.MainForm.PutCoreSyncSettings(_syncSettings);
+				MainForm.PutCoreSyncSettings(_syncSettings);
 			}
 
 			DialogResult = DialogResult.OK;
@@ -51,7 +54,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void CancelBtn_Click(object sender, EventArgs e)
 		{
-			GlobalWin.OSD.AddMessage("Controller settings aborted");
+			OSD.AddMessage("Controller settings aborted");
 			DialogResult = DialogResult.Cancel;
 			Close();
 		}

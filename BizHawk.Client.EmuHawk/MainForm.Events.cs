@@ -1898,7 +1898,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void SMSGraphicsSettingsMenuItem_Click(object sender, EventArgs e)
 		{
-			new SMSGraphicsConfig().ShowDialog();
+			_configManager.ShowDialog<SMSGraphicsConfig>();
 		}
 
 		private void GGGameGenieMenuItem_Click(object sender, EventArgs e)
@@ -1960,9 +1960,10 @@ namespace BizHawk.Client.EmuHawk
 
 		private void TI83PaletteMenuItem_Click(object sender, EventArgs e)
 		{
-			GlobalWin.OSD.AddMessage(new TI83PaletteConfig().ShowDialog() == DialogResult.OK
-				? "Palette settings saved"
-				: "Palette config aborted");
+			GlobalWin.OSD.AddMessage(
+				_configManager.ShowDialog<TI83PaletteConfig>() == DialogResult.OK
+					? "Palette settings saved"
+					: "Palette config aborted");
 		}
 
 		#endregion
@@ -2047,7 +2048,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void PSXControllerSettingsMenuItem_Click(object sender, EventArgs e)
 		{
-			new PSXControllerConfigNew().ShowDialog();
+			_configManager.ShowDialog<PSXControllerConfigNew>();
 		}
 
 		private void PSXOptionsMenuItem_Click(object sender, EventArgs e)
@@ -2066,7 +2067,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void PSXHashDiscsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			new PSXHashDiscs().ShowDialog();
+			_configManager.ShowDialog<PSXHashDiscs>();
 		}
 
 		#endregion
@@ -2155,7 +2156,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void SNESControllerConfigurationMenuItem_Click(object sender, EventArgs e)
 		{
-			new SNESControllerSettings().ShowDialog();
+			_configManager.ShowDialog<SNESControllerSettings>();
 		}
 
 		private void SnesGfxDebuggerMenuItem_Click(object sender, EventArgs e)

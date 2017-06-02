@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Windows.Forms;
 
+using BizHawk.Emulation.Common;
 using BizHawk.Emulation.Cores.Sony.PSX;
-using BizHawk.Client.Common;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public partial class PSXControllerConfigNew : Form
+	public partial class PSXControllerConfigNew : ConfigForm
 	{
+		[RequiredService]
+		private Octoshock Psx { get; set; }
+
 		public PSXControllerConfigNew()
 		{
 			InitializeComponent();
@@ -26,7 +29,7 @@ namespace BizHawk.Client.EmuHawk
 				combo.SelectedIndex = 0;
 			}
 
-			var psxSettings = ((Octoshock)Global.Emulator).GetSyncSettings();
+			var psxSettings = Psx.GetSyncSettings();
 			GuiFromUserConfig(psxSettings.FIOConfig);
 
 			RefreshLabels();
@@ -131,10 +134,10 @@ namespace BizHawk.Client.EmuHawk
 
 		private void BtnOk_Click(object sender, EventArgs e)
 		{
-			var psxSettings = ((Octoshock)Global.Emulator).GetSyncSettings();
+			var psxSettings = Psx.GetSyncSettings();
 
 			psxSettings.FIOConfig = UserConfigFromGui();
-			GlobalWin.MainForm.PutCoreSyncSettings(psxSettings);
+			MainForm.PutCoreSyncSettings(psxSettings);
 			
 			DialogResult = DialogResult.OK;
 			
