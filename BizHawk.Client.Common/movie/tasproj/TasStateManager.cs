@@ -32,15 +32,399 @@ namespace BizHawk.Client.Common
 			MountWriteAccess();
 		}
 
+		#region API
+
 		public void Dispose()
 		{
 			// States and BranchStates don't need cleaning because they would only contain an ndbdatabase entry which was demolished by the below
 			NdbDatabase?.Dispose();
 		}
 
+		public TasStateManagerSettings Settings { get; set; }
+
 		public Action<int> InvalidateCallback { private get; set; }
 
+		public byte[] InitialState
+		{
+			get
+			{
+				if (_movie.StartsFromSavestate)
+				{
+					return _movie.BinarySavestate;
+				}
+
+				return _states[0].State;
+			}
+		}
+
+		/// <summary>
+		/// Requests that the current emulator state be captured 
+		/// Unless force is true, the state may or may not be captured depending on the logic employed by "greenzone" management
+		/// </summary>
+		public void Capture(bool force = false)
+		{
+			bool shouldCapture;
+
+			int frame = Global.Emulator.Frame;
+			if (_movie.StartsFromSavestate && frame == 0) // Never capture frame 0 on savestate anchored movies since we have it anyway
+			{
+				shouldCapture = false;
+			}
+			else if (force)
+			{
+				shouldCapture = force;
+			}
+			else if (frame == 0) // For now, long term, TasMovie should have a .StartState property, and a tasproj file for the start state in non-savestate anchored movies
+			{
+				shouldCapture = true;
+			}
+			else if (_movie.Markers.IsMarker(frame + 1))
+			{
+				shouldCapture = true; // Markers shoudl always get priority
+			}
+			else
+			{
+				shouldCapture = frame % StateFrequency == 0;
+			}
+
+			if (shouldCapture)
+			{
+				SetState(frame, (byte[])Core.SaveStateBinary().Clone(), skipRemoval: false);
+			}
+		}
+
+		public bool HasState(int frame)
+		{
+			if (_movie.StartsFromSavestate && frame == 0)
+			{
+				return true;
+			}
+
+			return _states.ContainsKey(frame);
+		}
+
+		/// <summary>
+		/// Clears out all savestates after the given frame number
+		/// </summary>
+		public bool Invalidate(int frame)
+		{
+			bool anyInvalidated = false;
+
+			if (Any())
+			{
+				if (!_movie.StartsFromSavestate && frame == 0) // Never invalidate frame 0 on a non-savestate-anchored movie
+				{
+					frame = 1;
+				}
+
+				List<KeyValuePair<int, StateManagerState>> statesToRemove =
+					_states.Where(s => s.Key >= frame).ToList();
+
+				anyInvalidated = statesToRemove.Any();
+
+				foreach (var state in statesToRemove)
+				{
+					RemoveState(state.Key);
+				}
+
+				CallInvalidateCallback(frame);
+			}
+
+			return anyInvalidated;
+		}
+
+		/// <summary>
+		/// Clears all state information
+		/// </summary>
+		public void Clear()
+		{
+			_states.Clear();
+			_accessed.Clear();
+			Used = 0;
+			ClearDiskStates();
+		}
+
+		public void ClearStateHistory()
+		{
+			if (_states.Any())
+			{
+				StateManagerState power = _states.Values.First(s => s.Frame == 0);
+				StateAccessed(power.Frame);
+
+				_states.Clear();
+				_accessed.Clear();
+
+				SetState(0, power.State);
+				Used = (ulong)power.State.Length;
+
+				ClearDiskStates();
+			}
+		}
+
+		/// <summary>
+		/// Deletes/moves states to follow the state storage size limits.
+		/// Used after changing the settings.
+		/// </summary>
+		public void LimitStateCount()
+		{
+			while (Used + DiskUsed > Settings.CapTotal)
+			{
+				Point s = StateToRemove();
+				RemoveState(s.X, s.Y);
+			}
+
+			int index = -1;
+			while (DiskUsed > (ulong)Settings.DiskCapacitymb * 1024uL * 1024uL)
+			{
+				do
+				{
+					index++;
+				}
+				while (!_accessed[index].IsOnDisk);
+
+				_accessed[index].MoveToRAM();
+			}
+
+			if (Used > Settings.Cap)
+			{
+				MaybeRemoveStates();
+			}
+		}
+
+		public void Save(BinaryWriter bw)
+		{
+			List<int> noSave = ExcludeStates();
+
+			bw.Write(_states.Count - noSave.Count);
+			for (int i = 0; i < _states.Count; i++)
+			{
+				if (noSave.Contains(i))
+				{
+					continue;
+				}
+
+				StateAccessed(_states.ElementAt(i).Key);
+				KeyValuePair<int, StateManagerState> kvp = _states.ElementAt(i);
+				bw.Write(kvp.Key);
+				bw.Write(kvp.Value.Length);
+				bw.Write(kvp.Value.State);
+				////_movie.ReportProgress(100d / States.Count * i);
+			}
+		}
+
+		public void Load(BinaryReader br)
+		{
+			_states.Clear();
+			try
+			{
+				int nstates = br.ReadInt32();
+				for (int i = 0; i < nstates; i++)
+				{
+					int frame = br.ReadInt32();
+					int len = br.ReadInt32();
+					byte[] data = br.ReadBytes(len);
+
+					// whether we should allow state removal check here is an interesting question
+					// nothing was edited yet, so it might make sense to show the project untouched first
+					SetState(frame, data);
+					////States.Add(frame, data);
+					////Used += len;
+				}
+			}
+			catch (EndOfStreamException)
+			{
+			}
+		}
+
+		public void SaveBranchStates(BinaryWriter bw)
+		{
+			bw.Write(_branchStates.Count);
+			foreach (var s in _branchStates)
+			{
+				bw.Write(s.Key);
+				bw.Write(s.Value.Count);
+				foreach (var t in s.Value)
+				{
+					bw.Write(t.Key);
+					t.Value.Write(bw);
+				}
+			}
+		}
+
+		public void LoadBranchStates(BinaryReader br)
+		{
+			try
+			{
+				int c = br.ReadInt32();
+				_branchStates = new SortedList<int, SortedList<int, StateManagerState>>(c);
+				while (c > 0)
+				{
+					int key = br.ReadInt32();
+					int c2 = br.ReadInt32();
+					var list = new SortedList<int, StateManagerState>(c2);
+					while (c2 > 0)
+					{
+						int key2 = br.ReadInt32();
+						var state = StateManagerState.Read(br, this);
+						list.Add(key2, state);
+						c2--;
+					}
+
+					_branchStates.Add(key, list);
+					c--;
+				}
+			}
+			catch (EndOfStreamException)
+			{
+				// Bad!
+			}
+		}
+
+		public KeyValuePair<int, byte[]> GetStateClosestToFrame(int frame)
+		{
+			var s = _states.LastOrDefault(state => state.Key < frame);
+
+			return this[s.Key];
+		}
+
+		public bool Any()
+		{
+			if (_movie.StartsFromSavestate)
+			{
+				return _states.Count > 0;
+			}
+
+			return _states.Count > 1;
+		}
+
+		public int Last
+		{
+			get
+			{
+				if (Any())
+				{
+					return _states.Last().Key;
+				}
+
+				return 0;
+			}
+		}
+
+		public void AddBranch()
+		{
+			int branchHash = _movie.BranchHashByIndex(_movie.BranchCount - 1);
+
+			foreach (KeyValuePair<int, StateManagerState> kvp in _states)
+			{
+				if (!_branchStates.ContainsKey(kvp.Key))
+				{
+					_branchStates.Add(kvp.Key, new SortedList<int, StateManagerState>());
+				}
+
+				SortedList<int, StateManagerState> stateList = _branchStates[kvp.Key];
+
+				if (stateList == null) // when does this happen?
+				{
+					stateList = new SortedList<int, StateManagerState>();
+					_branchStates[kvp.Key] = stateList;
+				}
+
+				// We aren't creating any new states, just adding a reference to an already-existing one; so Used doesn't need to be updated.
+				stateList.Add(branchHash, kvp.Value);
+			}
+		}
+
+		public void RemoveBranch(int index)
+		{
+			int branchHash = _movie.BranchHashByIndex(index);
+
+			foreach (KeyValuePair<int, SortedList<int, StateManagerState>> kvp in _branchStates.ToList())
+			{
+				SortedList<int, StateManagerState> stateList = kvp.Value;
+				if (stateList == null)
+				{
+					continue;
+				}
+
+				stateList.Remove(branchHash);
+				if (stateList.Count == 0)
+				{
+					_branchStates.Remove(kvp.Key);
+				}
+			}
+		}
+
+		public void UpdateBranch(int index)
+		{
+			if (index == -1) // backup branch is outsider
+			{
+				return;
+			}
+
+			int branchHash = _movie.BranchHashByIndex(index);
+
+			// RemoveBranch
+			foreach (KeyValuePair<int, SortedList<int, StateManagerState>> kvp in _branchStates.ToList())
+			{
+				SortedList<int, StateManagerState> stateList = kvp.Value;
+				if (stateList == null)
+				{
+					continue;
+				}
+
+				stateList.Remove(branchHash);
+				if (stateList.Count == 0)
+				{
+					_branchStates.Remove(kvp.Key);
+				}
+			}
+
+			// AddBranch
+			foreach (KeyValuePair<int, StateManagerState> kvp in _states)
+			{
+				if (!_branchStates.ContainsKey(kvp.Key))
+				{
+					_branchStates.Add(kvp.Key, new SortedList<int, StateManagerState>());
+				}
+
+				SortedList<int, StateManagerState> stateList = _branchStates[kvp.Key];
+
+				if (stateList == null)
+				{
+					stateList = new SortedList<int, StateManagerState>();
+					_branchStates[kvp.Key] = stateList;
+				}
+
+				stateList.Add(branchHash, kvp.Value);
+			}
+		}
+
+		public void LoadBranch(int index)
+		{
+			if (index == -1) // backup branch is outsider
+			{
+				return;
+			}
+
+			int branchHash = _movie.BranchHashByIndex(index);
+
+			foreach (KeyValuePair<int, SortedList<int, StateManagerState>> kvp in _branchStates)
+			{
+				if (kvp.Key == 0 && _states.ContainsKey(0))
+				{
+					continue; // TODO: It might be a better idea to just not put state 0 in BranchStates.
+				}
+
+				if (kvp.Value.ContainsKey(branchHash))
+				{
+					SetState(kvp.Key, kvp.Value[branchHash].State);
+				}
+			}
+		}
+
 		internal NDBDatabase NdbDatabase { get; private set; } // TODO: internal so StateManagerState can access it, find a way to pass something in intead and lock this down.  Nothing else should use this
+
+		#endregion
 
 		// TODO: pass this in, and find a solution to a stale reference (this is instantiated BEFORE a new core instance is made, making this one stale if it is simply set in the constructor
 		private IStatable Core => Global.Emulator.AsStatable();
@@ -126,8 +510,6 @@ namespace BizHawk.Client.Common
 			NdbDatabase = new NDBDatabase(StatePath, Settings.DiskCapacitymb * 1024 * 1024, (int)_expectedStateSize);
 		}
 
-		public TasStateManagerSettings Settings { get; set; }
-
 		/// <summary>
 		/// Retrieves the savestate for the given frame,
 		/// If this frame does not have a state currently, will return an empty array
@@ -153,55 +535,6 @@ namespace BizHawk.Client.Common
 		}
 
 		private readonly List<StateManagerState> _accessed;
-
-		public byte[] InitialState
-		{
-			get
-			{
-				if (_movie.StartsFromSavestate)
-				{
-					return _movie.BinarySavestate;
-				}
-
-				return _states[0].State;
-			}
-		}
-
-		/// <summary>
-		/// Requests that the current emulator state be captured 
-		/// Unless force is true, the state may or may not be captured depending on the logic employed by "greenzone" management
-		/// </summary>
-		public void Capture(bool force = false)
-		{
-			bool shouldCapture;
-
-			int frame = Global.Emulator.Frame;
-			if (_movie.StartsFromSavestate && frame == 0) // Never capture frame 0 on savestate anchored movies since we have it anyway
-			{
-				shouldCapture = false;
-			}
-			else if (force)
-			{
-				shouldCapture = force;
-			}
-			else if (frame == 0) // For now, long term, TasMovie should have a .StartState property, and a tasproj file for the start state in non-savestate anchored movies
-			{
-				shouldCapture = true;
-			}
-			else if (_movie.Markers.IsMarker(frame + 1))
-			{
-				shouldCapture = true; // Markers shoudl always get priority
-			}
-			else
-			{
-				shouldCapture = frame % StateFrequency == 0;
-			}
-
-			if (shouldCapture)
-			{
-				SetState(frame, (byte[])Core.SaveStateBinary().Clone(), skipRemoval: false);
-			}
-		}
 
 		private void MaybeRemoveStates()
 		{
@@ -476,107 +809,9 @@ namespace BizHawk.Client.Common
 			}
 		}
 
-		public bool HasState(int frame)
-		{
-			if (_movie.StartsFromSavestate && frame == 0)
-			{
-				return true;
-			}
-
-			return _states.ContainsKey(frame);
-		}
-
-		/// <summary>
-		/// Clears out all savestates after the given frame number
-		/// </summary>
-		public bool Invalidate(int frame)
-		{
-			bool anyInvalidated = false;
-
-			if (Any())
-			{
-				if (!_movie.StartsFromSavestate && frame == 0) // Never invalidate frame 0 on a non-savestate-anchored movie
-				{
-					frame = 1;
-				}
-
-				List<KeyValuePair<int, StateManagerState>> statesToRemove =
-					_states.Where(s => s.Key >= frame).ToList();
-
-				anyInvalidated = statesToRemove.Any();
-
-				foreach (var state in statesToRemove)
-				{
-					RemoveState(state.Key);
-				}
-
-				CallInvalidateCallback(frame);
-			}
-
-			return anyInvalidated;
-		}
-
-		/// <summary>
-		/// Clears all state information
-		/// </summary>
-		public void Clear()
-		{
-			_states.Clear();
-			_accessed.Clear();
-			Used = 0;
-			ClearDiskStates();
-		}
-
-		public void ClearStateHistory()
-		{
-			if (_states.Any())
-			{
-				StateManagerState power = _states.Values.First(s => s.Frame == 0);
-				StateAccessed(power.Frame);
-
-				_states.Clear();
-				_accessed.Clear();
-
-				SetState(0, power.State);
-				Used = (ulong)power.State.Length;
-
-				ClearDiskStates();
-			}
-		}
-
 		private void ClearDiskStates()
 		{
 			NdbDatabase?.Clear();
-		}
-
-		/// <summary>
-		/// Deletes/moves states to follow the state storage size limits.
-		/// Used after changing the settings.
-		/// </summary>
-		public void LimitStateCount()
-		{
-			while (Used + DiskUsed > Settings.CapTotal)
-			{
-				Point s = StateToRemove();
-				RemoveState(s.X, s.Y);
-			}
-
-			int index = -1;
-			while (DiskUsed > (ulong)Settings.DiskCapacitymb * 1024uL * 1024uL)
-			{
-				do
-				{
-					index++;
-				}
-				while (!_accessed[index].IsOnDisk);
-
-				_accessed[index].MoveToRAM();
-			}
-
-			if (Used > Settings.Cap)
-			{
-				MaybeRemoveStates();
-			}
 		}
 
 		private List<int> ExcludeStates()
@@ -661,102 +896,6 @@ namespace BizHawk.Client.Common
 			return ret;
 		}
 
-		public void Save(BinaryWriter bw)
-		{
-			List<int> noSave = ExcludeStates();
-
-			bw.Write(_states.Count - noSave.Count);
-			for (int i = 0; i < _states.Count; i++)
-			{
-				if (noSave.Contains(i))
-				{
-					continue;
-				}
-
-				StateAccessed(_states.ElementAt(i).Key);
-				KeyValuePair<int, StateManagerState> kvp = _states.ElementAt(i);
-				bw.Write(kvp.Key);
-				bw.Write(kvp.Value.Length);
-				bw.Write(kvp.Value.State);
-				////_movie.ReportProgress(100d / States.Count * i);
-			}
-		}
-
-		public void Load(BinaryReader br)
-		{
-			_states.Clear();
-			try
-			{
-				int nstates = br.ReadInt32();
-				for (int i = 0; i < nstates; i++)
-				{
-					int frame = br.ReadInt32();
-					int len = br.ReadInt32();
-					byte[] data = br.ReadBytes(len);
-
-					// whether we should allow state removal check here is an interesting question
-					// nothing was edited yet, so it might make sense to show the project untouched first
-					SetState(frame, data);
-					////States.Add(frame, data);
-					////Used += len;
-				}
-			}
-			catch (EndOfStreamException)
-			{
-			}
-		}
-
-		public void SaveBranchStates(BinaryWriter bw)
-		{
-			bw.Write(_branchStates.Count);
-			foreach (var s in _branchStates)
-			{
-				bw.Write(s.Key);
-				bw.Write(s.Value.Count);
-				foreach (var t in s.Value)
-				{
-					bw.Write(t.Key);
-					t.Value.Write(bw);
-				}
-			}
-		}
-
-		public void LoadBranchStates(BinaryReader br)
-		{
-			try
-			{
-				int c = br.ReadInt32();
-				_branchStates = new SortedList<int, SortedList<int, StateManagerState>>(c);
-				while (c > 0)
-				{
-					int key = br.ReadInt32();
-					int c2 = br.ReadInt32();
-					var list = new SortedList<int, StateManagerState>(c2);
-					while (c2 > 0)
-					{
-						int key2 = br.ReadInt32();
-						var state = StateManagerState.Read(br, this);
-						list.Add(key2, state);
-						c2--;
-					}
-
-					_branchStates.Add(key, list);
-					c--;
-				}
-			}
-			catch (EndOfStreamException)
-			{
-				// Bad!
-			}
-		}
-
-		public KeyValuePair<int, byte[]> GetStateClosestToFrame(int frame)
-		{
-			var s = _states.LastOrDefault(state => state.Key < frame);
-
-			return this[s.Key];
-		}
-
 		// Map:
 		// 4 bytes - total savestate count
 		// [Foreach state]
@@ -795,44 +934,6 @@ namespace BizHawk.Client.Common
 				}
 
 				return (ulong)NdbDatabase.Consumed;
-			}
-		}
-
-		public int StateCount => _states.Count;
-
-		public bool Any()
-		{
-			if (_movie.StartsFromSavestate)
-			{
-				return _states.Count > 0;
-			}
-
-			return _states.Count > 1;
-		}
-
-		public int LastKey
-		{
-			get
-			{
-				if (_states.Count == 0)
-				{
-					return 0;
-				}
-
-				return _states.Last().Key;
-			}
-		}
-
-		public int LastEmulatedFrame
-		{
-			get
-			{
-				if (StateCount > 0)
-				{
-					return LastKey;
-				}
-
-				return 0;
 			}
 		}
 
@@ -913,140 +1014,6 @@ namespace BizHawk.Client.Common
 			}
 
 			return ret;
-		}
-
-		public void AddBranch()
-		{
-			int branchHash = _movie.BranchHashByIndex(_movie.BranchCount - 1);
-
-			foreach (KeyValuePair<int, StateManagerState> kvp in _states)
-			{
-				if (!_branchStates.ContainsKey(kvp.Key))
-				{
-					_branchStates.Add(kvp.Key, new SortedList<int, StateManagerState>());
-				}
-
-				SortedList<int, StateManagerState> stateList = _branchStates[kvp.Key];
-
-				if (stateList == null) // when does this happen?
-				{
-					stateList = new SortedList<int, StateManagerState>();
-					_branchStates[kvp.Key] = stateList;
-				}
-
-				// We aren't creating any new states, just adding a reference to an already-existing one; so Used doesn't need to be updated.
-				stateList.Add(branchHash, kvp.Value);
-			}
-		}
-
-		public void RemoveBranch(int index)
-		{
-			int branchHash = _movie.BranchHashByIndex(index);
-
-			foreach (KeyValuePair<int, SortedList<int, StateManagerState>> kvp in _branchStates.ToList())
-			{
-				SortedList<int, StateManagerState> stateList = kvp.Value;
-				if (stateList == null)
-				{
-					continue;
-				}
-
-				/*
-				if (stateList.ContainsKey(branchHash))
-				{
-					if (stateHasDuplicate(kvp.Key, branchHash) == -2)
-					{
-						if (!stateList[branchHash].IsOnDisk)
-							Used -= (ulong)stateList[branchHash].Length;
-					}
-				}
-				*/
-				stateList.Remove(branchHash);
-				if (stateList.Count == 0)
-				{
-					_branchStates.Remove(kvp.Key);
-				}
-			}
-		}
-
-		public void UpdateBranch(int index)
-		{
-			if (index == -1) // backup branch is outsider
-			{
-				return;
-			}
-
-			int branchHash = _movie.BranchHashByIndex(index);
-
-			// RemoveBranch
-			foreach (KeyValuePair<int, SortedList<int, StateManagerState>> kvp in _branchStates.ToList())
-			{
-				SortedList<int, StateManagerState> stateList = kvp.Value;
-				if (stateList == null)
-				{
-					continue;
-				}
-
-				/*
-				if (stateList.ContainsKey(branchHash))
-				{
-					if (stateHasDuplicate(kvp.Key, branchHash) == -2)
-					{
-						if (!stateList[branchHash].IsOnDisk)
-							Used -= (ulong)stateList[branchHash].Length;
-					}
-				}
-				*/
-				stateList.Remove(branchHash);
-				if (stateList.Count == 0)
-				{
-					_branchStates.Remove(kvp.Key);
-				}
-			}
-
-			// AddBranch
-			foreach (KeyValuePair<int, StateManagerState> kvp in _states)
-			{
-				if (!_branchStates.ContainsKey(kvp.Key))
-				{
-					_branchStates.Add(kvp.Key, new SortedList<int, StateManagerState>());
-				}
-
-				SortedList<int, StateManagerState> stateList = _branchStates[kvp.Key];
-
-				if (stateList == null)
-				{
-					stateList = new SortedList<int, StateManagerState>();
-					_branchStates[kvp.Key] = stateList;
-				}
-
-				stateList.Add(branchHash, kvp.Value);
-			}
-		}
-
-		public void LoadBranch(int index)
-		{
-			if (index == -1) // backup branch is outsider
-			{
-				return;
-			}
-
-			int branchHash = _movie.BranchHashByIndex(index);
-
-			////Invalidate(0); // Not a good way of doing it?
-
-			foreach (KeyValuePair<int, SortedList<int, StateManagerState>> kvp in _branchStates)
-			{
-				if (kvp.Key == 0 && _states.ContainsKey(0))
-				{
-					continue; // TODO: It might be a better idea to just not put state 0 in BranchStates.
-				}
-
-				if (kvp.Value.ContainsKey(branchHash))
-				{
-					SetState(kvp.Key, kvp.Value[branchHash].State);
-				}
-			}
 		}
 
 		#endregion
