@@ -44,19 +44,6 @@ namespace BizHawk.Client.Common
 
 		public Action<int> InvalidateCallback { private get; set; }
 
-		public byte[] InitialState
-		{
-			get
-			{
-				if (_movie.StartsFromSavestate)
-				{
-					return _movie.BinarySavestate;
-				}
-
-				return _states[0].State;
-			}
-		}
-
 		/// <summary>
 		/// Requests that the current emulator state be captured 
 		/// Unless force is true, the state may or may not be captured depending on the logic employed by "greenzone" management
@@ -425,6 +412,19 @@ namespace BizHawk.Client.Common
 		internal NDBDatabase NdbDatabase { get; private set; } // TODO: internal so StateManagerState can access it, find a way to pass something in intead and lock this down.  Nothing else should use this
 
 		#endregion
+
+		private byte[] InitialState
+		{
+			get
+			{
+				if (_movie.StartsFromSavestate)
+				{
+					return _movie.BinarySavestate;
+				}
+
+				return _states[0].State;
+			}
+		}
 
 		// TODO: pass this in, and find a solution to a stale reference (this is instantiated BEFORE a new core instance is made, making this one stale if it is simply set in the constructor
 		private IStatable Core => Global.Emulator.AsStatable();
