@@ -16,10 +16,34 @@ namespace BizHawk.Client.Common
 	/// </summary>
 	public class TasStateManager : IDisposable
 	{
+		public TasStateManager(TasMovie movie)
+		{
+			_movie = movie;
+
+			Settings = new TasStateManagerSettings(Global.Config.DefaultTasProjSettings);
+
+			_accessed = new List<StateManagerState>();
+
+			if (_movie.StartsFromSavestate)
+			{
+				SetState(0, _movie.BinarySavestate);
+			}
+
+			MountWriteAccess();
+		}
+
+		public void Dispose()
+		{
+			// States and BranchStates don't need cleaning because they would only contain an ndbdatabase entry which was demolished by the below
+			NdbDatabase?.Dispose();
+		}
+
+		public Action<int> InvalidateCallback { private get; set; }
+
+		internal NDBDatabase NdbDatabase { get; private set; } // TODO: internal so StateManagerState can access it, find a way to pass something in intead and lock this down.  Nothing else should use this
+
 		// TODO: pass this in, and find a solution to a stale reference (this is instantiated BEFORE a new core instance is made, making this one stale if it is simply set in the constructor
 		private IStatable Core => Global.Emulator.AsStatable();
-
-		public Action<int> InvalidateCallback { get; set; }
 
 		private void CallInvalidateCallback(int index)
 		{
@@ -27,7 +51,7 @@ namespace BizHawk.Client.Common
 		}
 
 		private readonly List<StateManagerState> _lowPriorityStates = new List<StateManagerState>();
-		internal NDBDatabase NdbDatabase { get; set; }
+		
 		private Guid _guid = Guid.NewGuid();
 		private SortedList<int, StateManagerState> _states = new SortedList<int, StateManagerState>();
 
@@ -71,30 +95,10 @@ namespace BizHawk.Client.Common
 
 		private int StateGap => 1 << Settings.StateGap;
 
-		public TasStateManager(TasMovie movie)
-		{
-			_movie = movie;
-
-			Settings = new TasStateManagerSettings(Global.Config.DefaultTasProjSettings);
-
-			_accessed = new List<StateManagerState>();
-
-			if (_movie.StartsFromSavestate)
-			{
-				SetState(0, _movie.BinarySavestate);
-			}
-		}
-
-		public void Dispose()
-		{
-			// States and BranchStates don't need cleaning because they would only contain an ndbdatabase entry which was demolished by the below
-			NdbDatabase?.Dispose();
-		}
-
 		/// <summary>
 		/// Mounts this instance for write access. Prior to that it's read-only
 		/// </summary>
-		public void MountWriteAccess()
+		private void MountWriteAccess()
 		{
 			if (_isMountedForWrite)
 			{

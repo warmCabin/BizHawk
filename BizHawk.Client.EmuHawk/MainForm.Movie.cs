@@ -31,8 +31,6 @@ namespace BizHawk.Client.EmuHawk
 			try
 			{
 				var tasmovie = (movie as TasMovie);
-				if (tasmovie != null)
-					tasmovie.TasStateManager.MountWriteAccess();
 				Global.MovieSession.QueueNewMovie(movie, record, Emulator);
 			}
 			catch (MoviePlatformMismatchException ex)
