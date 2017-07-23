@@ -121,17 +121,9 @@ namespace BizHawk.Client.Common
 		}
 
 		/// <summary>
-		/// Clears all state information
+		/// Clears all state information (except for the initial state which is by design immutable)
 		/// </summary>
 		public void Clear()
-		{
-			_states.Clear();
-			_accessed.Clear();
-			Used = 0;
-			ClearDiskStates();
-		}
-
-		public void ClearStateHistory()
 		{
 			if (_states.Any())
 			{

@@ -222,7 +222,7 @@ namespace BizHawk.Client.Common
 		{
 			if (_stateManager.Any())
 			{
-				_stateManager.ClearStateHistory();
+				_stateManager.Clear();
 				Changes = true;
 			}
 		}
