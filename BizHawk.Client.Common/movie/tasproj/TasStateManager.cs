@@ -40,6 +40,30 @@ namespace BizHawk.Client.Common
 			NdbDatabase?.Dispose();
 		}
 
+		/// <summary>
+		/// Retrieves the savestate for the given frame,
+		/// If this frame does not have a state currently, will return an empty array
+		/// </summary>
+		/// <returns>A savestate for the given frame or an empty array if there isn't one</returns>
+		public KeyValuePair<int, byte[]> this[int frame]
+		{
+			get
+			{
+				if (frame == 0)
+				{
+					return new KeyValuePair<int, byte[]>(0, InitialState);
+				}
+
+				if (_states.ContainsKey(frame))
+				{
+					StateAccessed(frame);
+					return new KeyValuePair<int, byte[]>(frame, _states[frame].State);
+				}
+
+				return new KeyValuePair<int, byte[]>(-1, new byte[0]);
+			}
+		}
+
 		public TasStateManagerSettings Settings { get; set; }
 
 		public Action<int> InvalidateCallback { private get; set; }
@@ -500,30 +524,6 @@ namespace BizHawk.Client.Common
 			}
 
 			NdbDatabase = new NDBDatabase(StatePath, Settings.DiskCapacitymb * 1024 * 1024, (int)_expectedStateSize);
-		}
-
-		/// <summary>
-		/// Retrieves the savestate for the given frame,
-		/// If this frame does not have a state currently, will return an empty array
-		/// </summary>
-		/// <returns>A savestate for the given frame or an empty array if there isn't one</returns>
-		public KeyValuePair<int, byte[]> this[int frame]
-		{
-			get
-			{
-				if (frame == 0)
-				{
-					return new KeyValuePair<int, byte[]>(0, InitialState);
-				}
-
-				if (_states.ContainsKey(frame))
-				{
-					StateAccessed(frame);
-					return new KeyValuePair<int, byte[]>(frame, _states[frame].State);
-				}
-
-				return new KeyValuePair<int, byte[]>(-1, new byte[0]);
-			}
 		}
 
 		private readonly List<StateManagerState> _accessed;
