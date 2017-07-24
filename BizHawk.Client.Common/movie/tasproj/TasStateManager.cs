@@ -45,22 +45,22 @@ namespace BizHawk.Client.Common
 		/// If this frame does not have a state currently, will return an empty array
 		/// </summary>
 		/// <returns>A savestate for the given frame or an empty array if there isn't one</returns>
-		public KeyValuePair<int, byte[]> this[int frame]
+		public byte[] this[int frame]
 		{
 			get
 			{
 				if (frame == 0)
 				{
-					return new KeyValuePair<int, byte[]>(0, InitialState);
+					return InitialState;
 				}
 
 				if (_states.ContainsKey(frame))
 				{
 					StateAccessed(frame);
-					return new KeyValuePair<int, byte[]>(frame, _states[frame].State);
+					return _states[frame].State;
 				}
 
-				return new KeyValuePair<int, byte[]>(-1, new byte[0]);
+				return new byte[0];
 			}
 		}
 
@@ -287,7 +287,12 @@ namespace BizHawk.Client.Common
 		{
 			var s = _states.LastOrDefault(state => state.Key < frame);
 
-			return this[s.Key];
+			if (s.Key == 0)
+			{
+				return new KeyValuePair<int, byte[]>(0, InitialState);
+			}
+
+			return new KeyValuePair<int, byte[]>(s.Key, this[s.Key]);
 		}
 
 		public bool Any()

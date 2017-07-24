@@ -60,7 +60,7 @@ namespace BizHawk.Client.EmuHawk
 					int lastState = CurrentTasMovie.TasStateManager.GetStateClosestToFrame(frame).Key; // Simply getting the last state doesn't work if that state is the frame. [dispaly isn't saved in the state, need to emulate to frame]
 					if (lastState > Emulator.Frame)
 					{
-						LoadState(CurrentTasMovie.TasStateManager[lastState]); // STATE ACCESS
+						LoadState(lastState, CurrentTasMovie.TasStateManager[lastState]); // STATE ACCESS
 					}
 
 					StartSeeking(frame);

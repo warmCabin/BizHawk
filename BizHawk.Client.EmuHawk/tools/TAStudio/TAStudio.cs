@@ -830,10 +830,10 @@ namespace BizHawk.Client.EmuHawk
 
 			_shouldUnpauseFromRewind = fromRewinding && !Mainform.EmulatorPaused;
 			TastudioPlayMode();
-			KeyValuePair<int, byte[]> closestState = CurrentTasMovie.TasStateManager.GetStateClosestToFrame(frame);
+			var closestState = CurrentTasMovie.TasStateManager.GetStateClosestToFrame(frame);
 			if (closestState.Value != null && (frame < Emulator.Frame || closestState.Key > Emulator.Frame))
 			{
-				LoadState(closestState);
+				LoadState(closestState.Key, closestState.Value);
 			}
 
 			if (fromLua)
@@ -883,11 +883,11 @@ namespace BizHawk.Client.EmuHawk
 			}
 		}
 
-		public void LoadState(KeyValuePair<int, byte[]> state)
+		public void LoadState(int frame, byte[] state)
 		{
-			StatableEmulator.LoadStateBinary(new BinaryReader(new MemoryStream(state.Value.ToArray())));
+			StatableEmulator.LoadStateBinary(new BinaryReader(new MemoryStream(state.ToArray())));
 
-			if (state.Key == 0 && CurrentTasMovie.StartsFromSavestate)
+			if (frame == 0 && CurrentTasMovie.StartsFromSavestate)
 			{
 				Emulator.ResetCounters();
 			}
