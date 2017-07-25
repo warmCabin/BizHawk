@@ -128,8 +128,7 @@ namespace BizHawk.Client.Common
 					frame = 1;
 				}
 
-				List<KeyValuePair<int, StateManagerState>> statesToRemove =
-					_states.Where(s => s.Key >= frame).ToList();
+				var statesToRemove = _states.Where(s => s.Key >= frame).ToList();
 
 				anyInvalidated = statesToRemove.Any();
 
@@ -271,6 +270,34 @@ namespace BizHawk.Client.Common
 				}
 
 				return 0;
+			}
+		}
+
+		// Used when loading a branch, that branch's state must be loaded and subsequently affect the greenzone
+		// TODO: this logic is probably wrong after removing branch states, I think the correct logic would involve invalidating states relevant to the old branch
+		public void SetState(int frame, byte[] state, bool skipRemoval = true)
+		{
+			if (!skipRemoval) // skipRemoval: false only when capturing new states
+			{
+				MaybeRemoveStates(); // Remove before adding so this state won't be removed.
+			}
+
+			Used += (ulong)state.Length;
+			if (_states.ContainsKey(frame))
+			{
+				_states[frame].State = state;
+			}
+			else
+			{
+				_states.Add(frame, new StateManagerState(this, state, frame));
+			}
+
+			StateAccessed(frame);
+
+			int i = _states.IndexOfKey(frame);
+			if (i > 0 && AllLag(_states.Keys[i - 1], _states.Keys[i]))
+			{
+				_lowPriorityStates.Add(_states[frame]);
 			}
 		}
 
@@ -517,32 +544,6 @@ namespace BizHawk.Client.Common
 		{
 			_states[index].MoveToRAM();
 			Used += (ulong)_states[index].Length;
-		}
-
-		internal void SetState(int frame, byte[] state, bool skipRemoval = true)
-		{
-			if (!skipRemoval) // skipRemoval: false only when capturing new states
-			{
-				MaybeRemoveStates(); // Remove before adding so this state won't be removed.
-			}
-
-			Used += (ulong)state.Length;
-			if (_states.ContainsKey(frame))
-			{
-				_states[frame].State = state;
-			}
-			else
-			{
-				_states.Add(frame, new StateManagerState(this, state, frame));
-			}
-
-			StateAccessed(frame);
-
-			int i = _states.IndexOfKey(frame);
-			if (i > 0 && AllLag(_states.Keys[i - 1], _states.Keys[i]))
-			{
-				_lowPriorityStates.Add(_states[frame]);
-			}
 		}
 
 		private void RemoveState(int frame)
