@@ -53,7 +53,6 @@ namespace BizHawk.Client.EmuHawk
             this.label8 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.NumSaveStatesLabel = new System.Windows.Forms.Label();
-            this.BranchStatesInTasproj = new System.Windows.Forms.CheckBox();
             this.StateGap = new System.Windows.Forms.NumericUpDown();
             this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
@@ -68,7 +67,7 @@ namespace BizHawk.Client.EmuHawk
             // 
             this.CancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.CancelBtn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.CancelBtn.Location = new System.Drawing.Point(217, 220);
+            this.CancelBtn.Location = new System.Drawing.Point(217, 175);
             this.CancelBtn.Name = "CancelBtn";
             this.CancelBtn.Size = new System.Drawing.Size(60, 23);
             this.CancelBtn.TabIndex = 0;
@@ -79,7 +78,7 @@ namespace BizHawk.Client.EmuHawk
             // OkBtn
             // 
             this.OkBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.OkBtn.Location = new System.Drawing.Point(151, 220);
+            this.OkBtn.Location = new System.Drawing.Point(151, 175);
             this.OkBtn.Name = "OkBtn";
             this.OkBtn.Size = new System.Drawing.Size(60, 23);
             this.OkBtn.TabIndex = 1;
@@ -259,18 +258,6 @@ namespace BizHawk.Client.EmuHawk
             this.NumSaveStatesLabel.TabIndex = 9;
             this.NumSaveStatesLabel.Text = "1kb";
             // 
-            // BranchStatesInTasproj
-            // 
-            this.BranchStatesInTasproj.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.BranchStatesInTasproj.AutoSize = true;
-            this.BranchStatesInTasproj.Location = new System.Drawing.Point(15, 165);
-            this.BranchStatesInTasproj.Name = "BranchStatesInTasproj";
-            this.BranchStatesInTasproj.Size = new System.Drawing.Size(158, 17);
-            this.BranchStatesInTasproj.TabIndex = 10;
-            this.BranchStatesInTasproj.Text = "Put branch states to .tasproj";
-            this.BranchStatesInTasproj.UseVisualStyleBackColor = true;
-            this.BranchStatesInTasproj.CheckedChanged += new System.EventHandler(this.BranchStatesInTasproj_CheckedChanged);
-            // 
             // StateGap
             // 
             this.StateGap.Location = new System.Drawing.Point(151, 112);
@@ -322,12 +309,11 @@ namespace BizHawk.Client.EmuHawk
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.CancelBtn;
-            this.ClientSize = new System.Drawing.Size(289, 255);
+            this.ClientSize = new System.Drawing.Size(289, 210);
             this.Controls.Add(this.NumFramesLabel);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.StateGap);
-            this.Controls.Add(this.BranchStatesInTasproj);
             this.Controls.Add(this.NumSaveStatesLabel);
             this.Controls.Add(this.NumStatesLabel);
             this.Controls.Add(this.label9);
@@ -377,7 +363,6 @@ namespace BizHawk.Client.EmuHawk
 		private Label label8;
 		private Label label9;
 		private Label NumSaveStatesLabel;
-		private CheckBox BranchStatesInTasproj;
 		private NumericUpDown StateGap;
 		private Label label10;
 		private Label label11;

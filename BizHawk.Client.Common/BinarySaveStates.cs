@@ -66,8 +66,6 @@ namespace BizHawk.Client.Common
 		public static BinaryStateLump BranchMarkers { get; private set; }
 		[Name("Branches\\UserText", "txt")]
 		public static BinaryStateLump BranchUserText { get; private set; }
-		[Name("Branches\\GreenZone")]
-		public static BinaryStateLump BranchStateHistory { get; private set; }
 
 		[AttributeUsage(AttributeTargets.Property)]
 		private class NameAttribute : Attribute

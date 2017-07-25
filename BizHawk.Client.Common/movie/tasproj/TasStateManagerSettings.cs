@@ -13,7 +13,6 @@ namespace BizHawk.Client.Common
 			Capacitymb = 512;
 			DiskCapacitymb = 512;
 			StateGap = 4;
-			BranchStatesInTasproj = false;
 		}
 
 		public TasStateManagerSettings(TasStateManagerSettings settings)
@@ -22,7 +21,6 @@ namespace BizHawk.Client.Common
 			Capacitymb = settings.Capacitymb;
 			DiskCapacitymb = settings.DiskCapacitymb;
 			StateGap = settings.StateGap;
-			BranchStatesInTasproj = settings.BranchStatesInTasproj;
 		}
 
 		/// <summary>
@@ -61,13 +59,6 @@ namespace BizHawk.Client.Common
 		public int StateGap { get; set; }
 
 		/// <summary>
-		/// Gets or sets a value indicating whether or not to save branch states into the movie file
-		/// </summary>
-		[DisplayName("Put branch states to .tasproj")]
-		[Description("Put branch states to .tasproj")]
-		public bool BranchStatesInTasproj { get; set; }
-
-		/// <summary>
 		/// The total state capacity in bytes.
 		/// </summary>
 		[JsonIgnore]
@@ -88,7 +79,6 @@ namespace BizHawk.Client.Common
 			sb.AppendLine(DiskSaveCapacitymb.ToString());
 			sb.AppendLine(Capacitymb.ToString());
 			sb.AppendLine(DiskCapacitymb.ToString());
-			sb.AppendLine(BranchStatesInTasproj.ToString());
 			sb.AppendLine(StateGap.ToString());
 
 			return sb.ToString();
@@ -114,8 +104,6 @@ namespace BizHawk.Client.Common
 					}
 
 					DiskCapacitymb = lines.Length > 2 ? int.Parse(lines[2]) : 512;
-
-					BranchStatesInTasproj = lines.Length > 3 && bool.Parse(lines[3]);
 
 					StateGap = lines.Length > 5 ? int.Parse(lines[5]) : 4;
 				}

@@ -239,50 +239,6 @@ namespace BizHawk.Client.Common
 			}
 		}
 
-		public void SaveBranchStates(BinaryWriter bw)
-		{
-			bw.Write(_branchStates.Count);
-			foreach (var s in _branchStates)
-			{
-				bw.Write(s.Key);
-				bw.Write(s.Value.Count);
-				foreach (var t in s.Value)
-				{
-					bw.Write(t.Key);
-					t.Value.Write(bw);
-				}
-			}
-		}
-
-		public void LoadBranchStates(BinaryReader br)
-		{
-			try
-			{
-				int c = br.ReadInt32();
-				_branchStates = new SortedList<int, SortedList<int, StateManagerState>>(c);
-				while (c > 0)
-				{
-					int key = br.ReadInt32();
-					int c2 = br.ReadInt32();
-					var list = new SortedList<int, StateManagerState>(c2);
-					while (c2 > 0)
-					{
-						int key2 = br.ReadInt32();
-						var state = StateManagerState.Read(br, this);
-						list.Add(key2, state);
-						c2--;
-					}
-
-					_branchStates.Add(key, list);
-					c--;
-				}
-			}
-			catch (EndOfStreamException)
-			{
-				// Bad!
-			}
-		}
-
 		public KeyValuePair<int, byte[]> GetStateClosestToFrame(int frame)
 		{
 			var s = _states.LastOrDefault(state => state.Key < frame);
