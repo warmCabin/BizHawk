@@ -37,7 +37,6 @@ namespace BizHawk.Client.EmuHawk
 			CapacityNumeric_ValueChanged(null, null);
 			SaveCapacityNumeric_ValueChanged(null, null);
 			BranchStatesInTasproj.Checked = _settings.BranchStatesInTasproj;
-			EraseBranchStatesFirst.Checked = _settings.EraseBranchStatesFirst;
 		}
 
 		private int MaxStatesInCapacity => (int)Math.Floor(MemCapacityNumeric.Value / _stateSizeMb)
@@ -74,11 +73,6 @@ namespace BizHawk.Client.EmuHawk
 		private void BranchStatesInTasproj_CheckedChanged(object sender, EventArgs e)
 		{
 			_settings.BranchStatesInTasproj = BranchStatesInTasproj.Checked;
-		}
-
-		private void EraseBranchStatesFIrst_CheckedChanged(object sender, EventArgs e)
-		{
-			_settings.EraseBranchStatesFirst = EraseBranchStatesFirst.Checked;
 		}
 
 		private void StateGap_ValueChanged(object sender, EventArgs e)

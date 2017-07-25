@@ -562,7 +562,8 @@ namespace BizHawk.Client.Common
 			// X is frame, Y is branch
 			Point shouldRemove = new Point(-1, -1);
 
-			if (_branchStates.Any() && Settings.EraseBranchStatesFirst)
+			// Always Erase Branch States first, for now
+			if (_branchStates.Any())
 			{
 				var kvp = _branchStates.Count > 1 ? _branchStates.ElementAt(1) : _branchStates.ElementAt(0);
 				shouldRemove.X = kvp.Key;
@@ -627,7 +628,8 @@ namespace BizHawk.Client.Common
 
 			if (shouldRemove.X < 1) // only found marker states above
 			{
-				if (_branchStates.Any() && !Settings.EraseBranchStatesFirst)
+				// Assume Erase Branch States First
+				if (_branchStates.Any())
 				{
 					var kvp = _branchStates.Count > 1 ? _branchStates.ElementAt(1) : _branchStates.ElementAt(0);
 					shouldRemove.X = kvp.Key;
@@ -735,7 +737,7 @@ namespace BizHawk.Client.Common
 			{
 				_accessed.Remove(_states[frame]);
 			}
-			else if (_accessed.Contains(_branchStates[frame][branch]) && !Settings.EraseBranchStatesFirst)
+			else if (_accessed.Contains(_branchStates[frame][branch])) // Assume erasing branch states first
 			{
 				_accessed.Remove(_branchStates[frame][branch]);
 			}
