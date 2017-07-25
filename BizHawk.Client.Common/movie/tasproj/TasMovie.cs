@@ -458,27 +458,6 @@ namespace BizHawk.Client.Common
 			return Branches.SingleOrDefault(b => b.UniqueIdentifier == id);
 		}
 
-		public int BranchHashByIndex(int index)
-		{
-			if (index >= Branches.Count)
-			{
-				return -1;
-			}
-
-			return Branches[index].UniqueIdentifier.GetHashCode();
-		}
-
-		public int BranchIndexByHash(int hash)
-		{
-			TasBranch branch = Branches.SingleOrDefault(b => b.UniqueIdentifier.GetHashCode() == hash);
-			if (branch == null)
-			{
-				return -1;
-			}
-
-			return Branches.IndexOf(branch);
-		}
-
 		public int BranchIndexByFrame(int frame)
 		{
 			TasBranch branch = Branches
@@ -497,13 +476,11 @@ namespace BizHawk.Client.Common
 		public void AddBranch(TasBranch branch)
 		{
 			Branches.Add(branch);
-			TasStateManager.AddBranch();
 			Changes = true;
 		}
 
 		public void RemoveBranch(TasBranch branch)
 		{
-			TasStateManager.RemoveBranch(Branches.IndexOf(branch));
 			Branches.Remove(branch);
 			Changes = true;
 		}
@@ -528,7 +505,6 @@ namespace BizHawk.Client.Common
 				_stateManager.Invalidate(branch.InputLog.Count);
 			}
 
-			_stateManager.LoadBranch(Branches.IndexOf(branch));
 			_stateManager.SetState(branch.Frame, branch.CoreData);
 
 			////ChangeLog = branch.ChangeLog;
@@ -550,7 +526,6 @@ namespace BizHawk.Client.Common
 			}
 
 			Branches[index] = newBranch;
-			TasStateManager.UpdateBranch(index);
 			Changes = true;
 		}
 

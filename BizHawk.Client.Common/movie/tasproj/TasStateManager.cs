@@ -136,7 +136,7 @@ namespace BizHawk.Client.Common
 				foreach (var state in statesToRemove)
 				{
 					RemoveState(state.Key);
-				}
+				} 
 
 				CallInvalidateCallback(frame);
 			}
@@ -172,8 +172,8 @@ namespace BizHawk.Client.Common
 		{
 			while (Used + DiskUsed > Settings.CapTotal)
 			{
-				Point s = StateToRemove();
-				RemoveState(s.X, s.Y);
+				int frame = StateToRemove();
+				RemoveState(frame);
 			}
 
 			int index = -1;
@@ -271,118 +271,6 @@ namespace BizHawk.Client.Common
 				}
 
 				return 0;
-			}
-		}
-
-		public void AddBranch()
-		{
-			int branchHash = _movie.BranchHashByIndex(_movie.BranchCount - 1);
-
-			foreach (KeyValuePair<int, StateManagerState> kvp in _states)
-			{
-				if (!_branchStates.ContainsKey(kvp.Key))
-				{
-					_branchStates.Add(kvp.Key, new SortedList<int, StateManagerState>());
-				}
-
-				SortedList<int, StateManagerState> stateList = _branchStates[kvp.Key];
-
-				if (stateList == null) // when does this happen?
-				{
-					stateList = new SortedList<int, StateManagerState>();
-					_branchStates[kvp.Key] = stateList;
-				}
-
-				// We aren't creating any new states, just adding a reference to an already-existing one; so Used doesn't need to be updated.
-				stateList.Add(branchHash, kvp.Value);
-			}
-		}
-
-		public void RemoveBranch(int index)
-		{
-			int branchHash = _movie.BranchHashByIndex(index);
-
-			foreach (KeyValuePair<int, SortedList<int, StateManagerState>> kvp in _branchStates.ToList())
-			{
-				SortedList<int, StateManagerState> stateList = kvp.Value;
-				if (stateList == null)
-				{
-					continue;
-				}
-
-				stateList.Remove(branchHash);
-				if (stateList.Count == 0)
-				{
-					_branchStates.Remove(kvp.Key);
-				}
-			}
-		}
-
-		public void UpdateBranch(int index)
-		{
-			if (index == -1) // backup branch is outsider
-			{
-				return;
-			}
-
-			int branchHash = _movie.BranchHashByIndex(index);
-
-			// RemoveBranch
-			foreach (KeyValuePair<int, SortedList<int, StateManagerState>> kvp in _branchStates.ToList())
-			{
-				SortedList<int, StateManagerState> stateList = kvp.Value;
-				if (stateList == null)
-				{
-					continue;
-				}
-
-				stateList.Remove(branchHash);
-				if (stateList.Count == 0)
-				{
-					_branchStates.Remove(kvp.Key);
-				}
-			}
-
-			// AddBranch
-			foreach (KeyValuePair<int, StateManagerState> kvp in _states)
-			{
-				if (!_branchStates.ContainsKey(kvp.Key))
-				{
-					_branchStates.Add(kvp.Key, new SortedList<int, StateManagerState>());
-				}
-
-				SortedList<int, StateManagerState> stateList = _branchStates[kvp.Key];
-
-				if (stateList == null)
-				{
-					stateList = new SortedList<int, StateManagerState>();
-					_branchStates[kvp.Key] = stateList;
-				}
-
-				stateList.Add(branchHash, kvp.Value);
-			}
-		}
-
-		public void LoadBranch(int index)
-		{
-			if (index == -1) // backup branch is outsider
-			{
-				return;
-			}
-
-			int branchHash = _movie.BranchHashByIndex(index);
-
-			foreach (KeyValuePair<int, SortedList<int, StateManagerState>> kvp in _branchStates)
-			{
-				if (kvp.Key == 0 && _states.ContainsKey(0))
-				{
-					continue; // TODO: It might be a better idea to just not put state 0 in BranchStates.
-				}
-
-				if (kvp.Value.ContainsKey(branchHash))
-				{
-					SetState(kvp.Key, kvp.Value[branchHash].State);
-				}
 			}
 		}
 
@@ -492,10 +380,10 @@ namespace BizHawk.Client.Common
 		private void MaybeRemoveStates()
 		{
 			// Loop, because removing a state that has a duplicate won't save any space
-			while (Used + _expectedStateSize > Settings.Cap || DiskUsed > (ulong)Settings.DiskCapacitymb * 1024 * 1024)
+			 while (Used + _expectedStateSize > Settings.Cap || DiskUsed > (ulong)Settings.DiskCapacitymb * 1024 * 1024)
 			{
-				Point shouldRemove = StateToRemove();
-				RemoveState(shouldRemove.X, shouldRemove.Y);
+				int shouldRemove = StateToRemove();
+				RemoveState(shouldRemove);
 			}
 
 			if (Used > Settings.Cap)
@@ -511,22 +399,12 @@ namespace BizHawk.Client.Common
 		}
 
 		/// <summary>
-		/// X is the frame of the state, Y is the branch (-1 for current).
+		/// returns the frame of the state
 		/// </summary>
-		private Point StateToRemove()
+		private int StateToRemove()
 		{
-			// X is frame, Y is branch
-			Point shouldRemove = new Point(-1, -1);
-
-			// Always Erase Branch States first, for now
-			if (_branchStates.Any())
-			{
-				var kvp = _branchStates.Count > 1 ? _branchStates.ElementAt(1) : _branchStates.ElementAt(0);
-				shouldRemove.X = kvp.Key;
-				shouldRemove.Y = kvp.Value.Keys[0];
-
-				return shouldRemove;
-			}
+			// shouldRemove is frame
+			int shouldRemove = -1;
 
 			int i = 0;
 			int markerSkips = MaxStates / 2;
@@ -536,7 +414,10 @@ namespace BizHawk.Client.Common
 			{
 				if (_lowPriorityStates.Count > i)
 				{
-					shouldRemove = FindState(_lowPriorityStates[i]);
+					if (_states.ContainsKey(_lowPriorityStates[i].Frame))
+					{
+						shouldRemove = _lowPriorityStates[i].Frame;
+					}
 				}
 				else
 				{
@@ -547,23 +428,26 @@ namespace BizHawk.Client.Common
 				markerSkips--;
 				if (markerSkips < 0)
 				{
-					shouldRemove.X = -1;
+					shouldRemove = -1;
 				}
 
 				i++;
 			}
-			while ((StateIsMarker(shouldRemove.X, shouldRemove.Y) && markerSkips > -1) || shouldRemove.X == 0);
+			while ((StateIsMarker(shouldRemove) && markerSkips > -1) || shouldRemove == 0);
 
 			// by last accessed
 			markerSkips = MaxStates / 2;
-			if (shouldRemove.X < 1)
+			if (shouldRemove < 1)
 			{
 				i = 0;
 				do
 				{
 					if (_accessed.Count > i)
 					{
-						shouldRemove = FindState(_accessed[i]);
+						if (_states.ContainsKey(_accessed[i].Frame))
+						{
+							shouldRemove = _accessed[i].Frame;
+						}
 					}
 					else
 					{
@@ -574,52 +458,31 @@ namespace BizHawk.Client.Common
 					markerSkips--;
 					if (markerSkips < 0)
 					{
-						shouldRemove.X = -1;
+						shouldRemove = -1;
 					}
 
 					i++;
 				}
-				while ((StateIsMarker(shouldRemove.X, shouldRemove.Y) && markerSkips > -1) || shouldRemove.X == 0);
+				while ((StateIsMarker(shouldRemove) && markerSkips > -1) || shouldRemove == 0);
 			}
 
-			if (shouldRemove.X < 1) // only found marker states above
+			if (shouldRemove < 1) // only found marker states above
 			{
-				// Assume Erase Branch States First
-				if (_branchStates.Any())
-				{
-					var kvp = _branchStates.Count > 1 ? _branchStates.ElementAt(1) : _branchStates.ElementAt(0);
-					shouldRemove.X = kvp.Key;
-					shouldRemove.Y = kvp.Value.Keys[0];
-				}
-				else
-				{
-					StateManagerState s = _states.Values[1];
-					shouldRemove.X = s.Frame;
-					shouldRemove.Y = -1;
-				}
+				StateManagerState s = _states.Values[1];
+				shouldRemove = s.Frame;
 			}
 
 			return shouldRemove;
 		}
 
-		private bool StateIsMarker(int frame, int branch)
+		private bool StateIsMarker(int frame)
 		{
-			if (frame == -1)
+			if (frame == -1) // TODO: never pass in -1, just don't call this
 			{
 				return false;
 			}
 
-			if (branch == -1)
-			{
-				return _movie.Markers.IsMarker(_states[frame].Frame + 1);
-			}
-
-			if (_movie.GetBranch(_movie.BranchIndexByHash(branch)).Markers == null)
-			{
-				return _movie.Markers.IsMarker(_states[frame].Frame + 1);
-			}
-
-			return _movie.GetBranch(branch).Markers.Any(m => m.Frame + 1 == frame);
+			return _movie.Markers.IsMarker(_states[frame].Frame + 1);
 		}
 
 		private bool AllLag(int from, int upTo)
@@ -663,18 +526,13 @@ namespace BizHawk.Client.Common
 				MaybeRemoveStates(); // Remove before adding so this state won't be removed.
 			}
 
+			Used += (ulong)state.Length;
 			if (_states.ContainsKey(frame))
 			{
-				if (StateHasDuplicate(frame, -1) != -2)
-				{
-					Used += (ulong)state.Length;
-				}
-
 				_states[frame].State = state;
 			}
 			else
 			{
-				Used += (ulong)state.Length;
 				_states.Add(frame, new StateManagerState(this, state, frame));
 			}
 
@@ -687,54 +545,24 @@ namespace BizHawk.Client.Common
 			}
 		}
 
-		private void RemoveState(int frame, int branch = -1)
+		private void RemoveState(int frame)
 		{
-			if (branch == -1)
-			{
-				_accessed.Remove(_states[frame]);
-			}
-			else if (_accessed.Contains(_branchStates[frame][branch])) // Assume erasing branch states first
-			{
-				_accessed.Remove(_branchStates[frame][branch]);
-			}
+			_accessed.Remove(_states[frame]);
 
 			StateManagerState state;
-			bool hasDuplicate = StateHasDuplicate(frame, branch) != -2;
-			if (branch == -1)
+			state = _states[frame];
+			if (_states[frame].IsOnDisk)
 			{
-				state = _states[frame];
-				if (_states[frame].IsOnDisk)
-				{
-					_states[frame].Dispose();
-				}
-				else
-				{
-					Used -= (ulong)_states[frame].Length;
-				}
-
-				_states.RemoveAt(_states.IndexOfKey(frame));
+				_states[frame].Dispose();
 			}
 			else
 			{
-				state = _branchStates[frame][branch];
-
-				if (_branchStates[frame][branch].IsOnDisk)
-				{
-					_branchStates[frame][branch].Dispose();
-				}
-
-				_branchStates[frame].RemoveAt(_branchStates[frame].IndexOfKey(branch));
-
-				if (_branchStates[frame].Count == 0)
-				{
-					_branchStates.Remove(frame);
-				}
+				Used -= (ulong)_states[frame].Length;
 			}
 
-			if (!hasDuplicate)
-			{
-				_lowPriorityStates.Remove(state);
-			}
+			_states.RemoveAt(_states.IndexOfKey(frame));
+
+			_lowPriorityStates.Remove(state);
 		}
 
 		private void StateAccessed(int frame)
@@ -891,86 +719,5 @@ namespace BizHawk.Client.Common
 				return (ulong)NdbDatabase.Consumed;
 			}
 		}
-
-		#region Branches
-
-		private SortedList<int, SortedList<int, StateManagerState>> _branchStates = new SortedList<int, SortedList<int, StateManagerState>>();
-
-		/// <summary>
-		/// Checks if the state at frame in the given branch (-1 for current) has any duplicates.
-		/// </summary>
-		/// <returns>Index of the branch (-1 for current) of the first match. If no match, returns -2.</returns>
-		private int StateHasDuplicate(int frame, int branchHash)
-		{
-			StateManagerState stateToMatch;
-
-			// Get the state instance
-			if (branchHash == -1)
-			{
-				stateToMatch = _states[frame];
-			}
-			else
-			{
-				if (!_branchStates[frame].ContainsKey(branchHash))
-				{
-					return -2;
-				}
-
-				stateToMatch = _branchStates[frame][branchHash];
-
-				// Check the current branch for duplicate.
-				if (_states.ContainsKey(frame) && _states[frame] == stateToMatch)
-				{
-					return -1;
-				}
-			}
-
-			// Check if there are any branch states for the given frame.
-			if (!_branchStates.ContainsKey(frame) || _branchStates[frame] == null || branchHash == -1)
-			{
-				return -2;
-			}
-
-			// Loop through branch states for the given frame.
-			SortedList<int, StateManagerState> stateList = _branchStates[frame];
-			for (int i = 0; i < stateList.Count; i++)
-			{
-				// Don't check the branch containing the state to match.
-				if (i == _movie.BranchIndexByHash(branchHash))
-				{
-					continue;
-				}
-
-				if (stateList.Values[i] == stateToMatch)
-				{
-					return i;
-				}
-			}
-
-			return -2; // No match.
-		}
-
-		private Point FindState(StateManagerState s)
-		{
-			Point ret = new Point(0, -1);
-			ret.X = s.Frame;
-			if (!_states.ContainsValue(s))
-			{
-				if (_branchStates.ContainsKey(s.Frame))
-				{
-					int index = _branchStates[s.Frame].Values.IndexOf(s);
-					ret.Y = _branchStates[s.Frame].Keys.ElementAt(index);
-				}
-
-				if (ret.Y == -1)
-				{
-					return new Point(-1, -2);
-				}
-			}
-
-			return ret;
-		}
-
-		#endregion
 	}
 }
