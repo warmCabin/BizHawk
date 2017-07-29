@@ -64,7 +64,22 @@ namespace BizHawk.Client.Common
 			}
 		}
 
-		public TasStateManagerSettings Settings { get; set; }
+		public TasStateManagerSettings Settings
+		{
+			get
+			{
+				return _settings;
+			}
+
+			set
+			{
+				_settings = value;
+				if (Any())
+				{
+					LimitStateCount();
+				}
+			}
+		}
 
 		public Action<int> InvalidateCallback { private get; set; }
 
@@ -160,36 +175,6 @@ namespace BizHawk.Client.Common
 				Used = (ulong)power.State.Length;
 
 				ClearDiskStates();
-			}
-		}
-
-		/// <summary>
-		/// Deletes/moves states to follow the state storage size limits.
-		/// Used after changing the settings.
-		/// </summary>
-		public void LimitStateCount()
-		{
-			while (Used + DiskUsed > Settings.CapTotal)
-			{
-				int frame = StateToRemove();
-				RemoveState(frame);
-			}
-
-			int index = -1;
-			while (DiskUsed > (ulong)Settings.DiskCapacitymb * 1024uL * 1024uL)
-			{
-				do
-				{
-					index++;
-				}
-				while (!_accessed[index].IsOnDisk);
-
-				_accessed[index].MoveToRAM();
-			}
-
-			if (Used > Settings.Cap)
-			{
-				MaybeRemoveStates();
 			}
 		}
 
@@ -304,6 +289,36 @@ namespace BizHawk.Client.Common
 		internal NDBDatabase NdbDatabase { get; private set; } // TODO: internal so StateManagerState can access it, find a way to pass something in intead and lock this down.  Nothing else should use this
 
 		#endregion
+
+		private TasStateManagerSettings _settings;
+
+		// Deletes/moves states to follow the state storage size limits.
+		// Used after changing the settings.
+		private void LimitStateCount()
+		{
+			while (Used + DiskUsed > Settings.CapTotal)
+			{
+				int frame = StateToRemove();
+				RemoveState(frame);
+			}
+
+			int index = -1;
+			while (DiskUsed > (ulong)Settings.DiskCapacitymb * 1024uL * 1024uL)
+			{
+				do
+				{
+					index++;
+				}
+				while (!_accessed[index].IsOnDisk);
+
+				_accessed[index].MoveToRAM();
+			}
+
+			if (Used > Settings.Cap)
+			{
+				MaybeRemoveStates();
+			}
+		}
 
 		private byte[] InitialState
 		{

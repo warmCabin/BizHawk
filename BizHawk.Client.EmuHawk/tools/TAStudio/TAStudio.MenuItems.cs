@@ -1015,7 +1015,6 @@ namespace BizHawk.Client.EmuHawk
 				Location = this.ChildPointToScreen(TasView),
 				Statable = this.StatableEmulator
 			}.ShowDialog();
-			CurrentTasMovie.TasStateManager.LimitStateCount();
 			UpdateChangesIndicator();
 		}
 
