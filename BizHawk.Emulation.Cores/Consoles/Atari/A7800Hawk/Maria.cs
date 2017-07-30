@@ -124,7 +124,6 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 					Core.tia._hsyncCnt = 0;
 					Core.cpu.RDY = true;
 				}
-
 			}
 
 			// "The end of vblank is made up of a DMA startup plus a long shut down"
@@ -284,7 +283,6 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 						scanline_buffer[pixel] = _palette[Core.Maria_regs[0x00]];
 					}
 					
-
 					// send buffer to the video buffer
 					_vidbuffer[(scanline - 21) * 320 + pixel] = scanline_buffer[pixel];
 
@@ -301,6 +299,7 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 				if (cycle == 454)
 				{
 					scanline++;
+
 					cycle = 0;
 					Core.tia._hsyncCnt = 0;
 					Core.cpu.RDY = true;
@@ -482,13 +481,16 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 									{
 										GFX_Objects[header_counter].obj[i * ch_size + 1] = 0;
 									}
-									if (ch_size == 1)
+									if (i != 0)
 									{
-										graphics_read_time -= 6;
-									}
-									else
-									{
-										graphics_read_time -= 9;
+										if (ch_size == 1)
+										{
+											graphics_read_time -= 6;
+										}
+										else
+										{
+											graphics_read_time -= 9;
+										}
 									}
 									
 								}
@@ -506,11 +508,6 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 									}
 								}
 							}
-							if (graphics_read_time == 0)
-							{
-								graphics_read_time = 3;
-							}
-
 						}
 						else
 						{
@@ -523,7 +520,10 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 								if (((current_DLL_H16 && addr_t.Bit(12)) || (current_DLL_H8 && addr_t.Bit(11))) && (addr_t >= 0x8000))
 								{
 									GFX_Objects[header_counter].obj[i] = 0;
-									graphics_read_time -= 3;
+									if (i != 0)
+									{ 
+										graphics_read_time -= 3;
+									}
 								}
 								else
 								{
