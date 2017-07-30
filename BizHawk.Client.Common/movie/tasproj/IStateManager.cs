@@ -22,7 +22,7 @@ namespace BizHawk.Client.Common
 
 		void Save(BinaryWriter bw);
 
-		void Load(BinaryReader bw);
+		void Load(BinaryReader br);
 
 		KeyValuePair<int, byte[]> GetStateClosestToFrame(int frame);
 

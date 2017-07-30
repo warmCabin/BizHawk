@@ -183,6 +183,7 @@
     <Compile Include="movie\bk2\StringLogs.cs" />
     <Compile Include="movie\import\PXMImport.cs" />
     <Compile Include="movie\tasproj\IStateManager.cs" />
+    <Compile Include="movie\tasproj\StateManager.cs" />
     <Compile Include="movie\tasproj\StateManagerState.cs" />
     <Compile Include="movie\tasproj\TasBranch.cs" />
     <Compile Include="movie\tasproj\TasMovie.History.cs" />
