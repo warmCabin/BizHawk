@@ -14,7 +14,7 @@ namespace BizHawk.Client.Common
 	/// Captures savestates and manages the logic of adding, retrieving, 
 	/// invalidating/clearing of states.  Also does memory management and limiting of states
 	/// </summary>
-	public class TasStateManager : IDisposable
+	public class TasStateManager : IStateManager, IDisposable
 	{
 		public TasStateManager(TasMovie movie)
 		{

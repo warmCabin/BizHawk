@@ -13,7 +13,7 @@ namespace BizHawk.Client.Common
 	public sealed partial class TasMovie : Bk2Movie, INotifyPropertyChanged
 	{
 		private readonly Bk2MnemonicConstants _mnemonics = new Bk2MnemonicConstants();
-		private readonly TasStateManager _stateManager;
+		private readonly IStateManager _stateManager;
 		private readonly TasLagLog _lagLog = new TasLagLog();
 		private readonly Dictionary<int, IController> _inputStateCache = new Dictionary<int, IController>();
 
@@ -42,7 +42,7 @@ namespace BizHawk.Client.Common
 		public int BranchCount => Branches.Count;
 		public int LastValidFrame => _lagLog.LastValidFrame;
 		public override string PreferredExtension => Extension;
-		public TasStateManager TasStateManager => _stateManager;
+		public IStateManager TasStateManager => _stateManager;
 
 		public TasMovieRecord this[int index] => new TasMovieRecord
 		{
