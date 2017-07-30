@@ -115,7 +115,7 @@ namespace BizHawk.Client.Common
 
 			if (shouldCapture)
 			{
-				SetState(frame, (byte[])Core.SaveStateBinary().Clone(), skipRemoval: false);
+				SetStateInternal(frame, (byte[])Core.SaveStateBinary().Clone(), skipRemoval: false);
 			}
 		}
 
@@ -258,9 +258,13 @@ namespace BizHawk.Client.Common
 			}
 		}
 
+		public void SetState(int frame, byte[] state)
+		{
+			SetStateInternal(frame, state, skipRemoval: true);
+		}
+
 		// Used when loading a branch, that branch's state must be loaded and subsequently affect the greenzone
-		// TODO: this logic is probably wrong after removing branch states, I think the correct logic would involve invalidating states relevant to the old branch
-		public void SetState(int frame, byte[] state, bool skipRemoval = true)
+		private void SetStateInternal(int frame, byte[] state, bool skipRemoval)
 		{
 			if (!skipRemoval) // skipRemoval: false only when capturing new states
 			{
