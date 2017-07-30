@@ -13,7 +13,6 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 		//Maria related variables
 		public int cycle;
 		public int cpu_cycle;
-		public int m6532_cycle;
 		public bool cpu_is_haltable;
 		public bool cpu_is_halted;
 		public bool cpu_halt_pending;
@@ -33,15 +32,28 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 		public bool right_was_pressed;
 		public bool p1_is_2button;
 		public bool p2_is_2button;
+		public bool p1_is_lightgun;
+		public bool p2_is_lightgun;
+		public float p1_lightgun_x;
+		public float p1_lightgun_y;
+		public float p2_lightgun_x;
+		public float p2_lightgun_y;
+		public int lg_counting_down;
+		public int lg_counting_down_2;
+		public int lg_counting_down_3;
+		public bool lg_trigger_hit;
+		public bool lg_do_once = true;
 
 		// there are 4 maria cycles in a CPU cycle (fast access, both NTSC and PAL)
 		// if the 6532 or TIA are accessed (PC goes to one of those addresses) the next access will be slower by 1/2 a CPU cycle
 		// i.e. it will take 6 Maria cycles instead of 4
 		public bool slow_access = false;
+		public int slow_countdown;
 
 		public void FrameAdvance(IController controller, bool render, bool rendersound)
 		{
 			Console.WriteLine("-----------------------FRAME-----------------------");
+
 			if (_tracer.Enabled)
 			{
 				cpu.TraceCallback = s => _tracer.Put(s);
@@ -65,18 +77,57 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 			GetControllerState(controller);
 			GetConsoleState(controller);
 
+			//reset lightgun detection
+			lg_do_once = true;
+			lg_trigger_hit = false;
+
 			maria.RunFrame();
 
 			if (_islag)
 			{
 				_lagcount++;
 			}
-
 		}
 
 		public void RunCPUCycle()
 		{
-			cpu_cycle++;
+			if (slow_countdown==0)
+			{
+				cpu_cycle++;
+			}
+			else
+			{
+				slow_countdown--;
+			}
+
+			if (lg_counting_down > 0)
+			{
+				lg_counting_down--;
+				if (lg_counting_down==0)
+				{
+					lg_trigger_hit = true;
+					lg_counting_down_2 = 454;
+					lg_counting_down_3 = 8;
+				}
+			}
+
+			if (lg_counting_down_2 > 0)
+			{
+				lg_counting_down_2--;
+				if (lg_counting_down_2 == 0 && lg_counting_down_3 > 0)
+				{
+					lg_counting_down_3--;
+					lg_counting_down_2 = 454;
+					lg_trigger_hit = true;
+				}
+
+				if (lg_counting_down_2 == 424)
+				{
+					lg_trigger_hit = false;
+				}
+			}
+
+
 			tia._hsyncCnt++;
 			tia._hsyncCnt %= 454;
 			// do the audio sampling
@@ -86,11 +137,10 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 			}
 
 			// tick the m6532 timer, which is still active although not recommended to use
-			m6532_cycle++;
-			if (m6532_cycle== 4)
+			// also it runs off of the cpu cycle timer
+			if (cpu_cycle== 4)
 			{
 				m6532.Timer.Tick();
-				m6532_cycle = 0;
 			}
 
 			if (cpu_cycle <= (2 + (slow_access ? 1 : 0)))
@@ -109,6 +159,13 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 				if (!cpu_is_halted)
 				{
 					cpu.ExecuteOne();
+
+					// we need to stall the next cpu cycle from starting if the current one is a slow access
+					if (slow_access)
+					{
+						slow_access = false;
+						slow_countdown = 2;
+					}
 				}
 				else
 				{
@@ -131,32 +188,6 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 					cpu_is_halted = false;
 				}
 			}
-
-			// determine if the next access will be fast or slow
-			if ((cpu.PC & 0xFCE0) == 0)
-			{
-				// return TIA registers or control register if it is still unlocked
-				if ((A7800_control_register & 0x1) == 0)
-				{
-					slow_access = false;
-				}
-				else
-				{
-					slow_access = true;
-				}
-			}
-			else if ((cpu.PC & 0xFF80) == 0x280)
-			{
-				slow_access = true;
-			}
-			else if ((cpu.PC & 0xFE80) == 0x480)
-			{
-				slow_access = true;
-			}
-			else
-			{
-				slow_access = false;
-			}
 		}
 
 		public void GetControllerState(IController controller)
@@ -171,6 +202,8 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 			p2_fire_2x = _controllerDeck.ReadFire2_2x(controller);
 			p1_is_2button = _controllerDeck.Is_2_button1(controller);
 			p2_is_2button = _controllerDeck.Is_2_button2(controller);
+			p1_is_lightgun = _controllerDeck.Is_LightGun1(controller, out p1_lightgun_x, out p1_lightgun_y);
+			p2_is_lightgun = _controllerDeck.Is_LightGun2(controller, out p2_lightgun_x, out p2_lightgun_y);
 		}
 
 		public void GetConsoleState(IController controller)
@@ -221,6 +254,32 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 			}
 
 			con_state = result;
+		}
+
+		public byte getLightGunState(int p_x)
+		{
+			float x = p_x == 1 ? p1_lightgun_x : p2_lightgun_x;
+			float y = p_x == 1 ? p1_lightgun_y : p2_lightgun_y;
+
+			if ((maria.scanline - 20) == y-4)
+			{
+				if (maria.cycle >= (133 + x) && lg_do_once)
+				{
+					// return true 61 cycles into the future
+					lg_counting_down = 64 - (maria.cycle - (int)(133 + x));
+					lg_do_once = false;
+				}
+			}
+
+			if (lg_trigger_hit)
+			{
+				return 0x0;
+			}
+			else
+			{
+				return 0x80;
+			}
+
 		}
 
 		public int Frame => _frame;

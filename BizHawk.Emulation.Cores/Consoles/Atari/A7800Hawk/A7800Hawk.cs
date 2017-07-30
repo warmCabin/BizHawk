@@ -233,7 +233,7 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 			ser.Register<ITraceable>(_tracer);
 
 			SetupMemoryDomains();
-			HardReset();
+			HardReset();		
 		}
 
 		public DisplayType Region => _isPAL ? DisplayType.PAL : DisplayType.NTSC;
@@ -283,6 +283,14 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 			if (m == "4")
 			{
 				mapper = new MapperRampage();
+			}
+			if (m == "5")
+			{
+				mapper = new MapperFractalus();
+			}
+			if (m == "6")
+			{
+				mapper = new MapperFractalus();
 			}
 
 			mapper.Core = this;
