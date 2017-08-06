@@ -33,7 +33,7 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 			_capChargeStart = 0;
 			_capCharging = false;
 			AudioClocks = 0;
-			_spf = (Core.maria._frameHz > 55) ? 740 : 880;
+			_spf = (Core._frameHz > 55) ? 740 : 880;
 			_doTicks = false;
 		}
 
@@ -160,7 +160,7 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 					}
 					else
 					{
-						return Core.getLightGunState(1);
+						return Core.lg_1_trigger_hit;
 					}			
 				}
 				else if ((Core.m6532._outputB & 0x04) != 0 || (Core.m6532._ddRb & 0x04) != 0x04)
@@ -184,7 +184,7 @@ namespace BizHawk.Emulation.Cores.Atari.A7800Hawk
 					}
 					else
 					{
-						return Core.getLightGunState(2);
+						return Core.lg_2_trigger_hit;
 					}
 				}
 				else if ((Core.m6532._outputB & 0x10) != 0 || (Core.m6532._ddRb & 0x10) != 0x10)
