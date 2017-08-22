@@ -64,7 +64,7 @@ namespace BizHawk.Client.Common
 			}
 
 			ChangeLog = new TasMovieChangeLog(this);
-			_stateManager = new TasStateManager(this);
+			_stateManager = new StateManager(this);
 			Session = new TasSession(this);
 			Header[HeaderKeys.MOVIEVERSION] = "BizHawk v2.0 Tasproj v1.0";
 			Markers = new TasMovieMarkerList(this);
@@ -83,7 +83,7 @@ namespace BizHawk.Client.Common
 			}
 
 			ChangeLog = new TasMovieChangeLog(this);
-			_stateManager = new TasStateManager(this);
+			_stateManager = new StateManager(this);
 			Session = new TasSession(this);
 			Header[HeaderKeys.MOVIEVERSION] = "BizHawk v2.0 Tasproj v1.0";
 			Markers = new TasMovieMarkerList(this);
