@@ -3,6 +3,12 @@
   <ItemGroup>
     <ProjectReference Include="..\BizHawk.Client.Common\BizHawk.Client.Common.csproj" />
     <ProjectReference Include="..\Bizware\BizHawk.Bizware.BizwareGL\BizHawk.Bizware.BizwareGL.csproj" />
+    <ProjectReference Include="..\BizHawk.Client.ApiHawk\BizHawk.Client.ApiHawk.csproj" />
+    <ProjectReference Include="..\BizHawk.Emulation.DiscSystem\BizHawk.Emulation.DiscSystem.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="tools\Lua\**\*.cs" />
   </ItemGroup>
 
   <PropertyGroup>
