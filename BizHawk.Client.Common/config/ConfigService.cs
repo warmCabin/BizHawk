@@ -17,7 +17,7 @@ namespace BizHawk.Client.Common
 			Serializer = new JsonSerializer
 			{
 				MissingMemberHandling = MissingMemberHandling.Ignore,
-				MissingTypeHandling = MissingTypeHandling.Ignore,
+				// MissingTypeHandling = MissingTypeHandling.Ignore, // TODO
 				TypeNameHandling = TypeNameHandling.Auto,
 				ConstructorHandling = ConstructorHandling.Default,
 

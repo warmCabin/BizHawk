@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 #if !WINCE
-using System.Runtime.Remoting.Messaging;
+// using System.Runtime.Remoting.Messaging;
 #endif
 #if DOTNET20
 using System.Threading;
@@ -76,9 +76,10 @@ namespace SevenZip
         /// <param name="ar">IAsyncResult instance.</param>
         internal static void AsyncCallbackMethod(IAsyncResult ar)
         {
-            var result = (AsyncResult)ar;
-            result.AsyncDelegate.GetType().GetMethod("EndInvoke").Invoke(result.AsyncDelegate, new[] { ar });
-            ((SevenZipBase)ar.AsyncState).ReleaseContext();
+            throw new Exception("netcore doesn't have asyncdelegate, fixme");
+            // var result = (AsyncResult)ar;
+            // result.AsyncDelegate.GetType().GetMethod("EndInvoke").Invoke(result.AsyncDelegate, new[] { ar });
+            // ((SevenZipBase)ar.AsyncState).ReleaseContext();
         }
 
         virtual internal void SaveContext(

@@ -1,6 +1,6 @@
 using System.IO;
 
-internal static class VersionInfo
+public static class VersionInfo
 {
     // keep this updated at every major release
 	public const string Mainversion = "2.3.0"; // Use numbers only or the new version notification won't work
