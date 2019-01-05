@@ -98,7 +98,7 @@ namespace BizHawk.Emulation.Cores.Waterbox
 
 				foreach (var seg in loadsegs)
 				{
-					var data = seg.GetContents();
+					var data = seg.GetFileContents(); // ?? seg.GetContents();
 					Marshal.Copy(data, 0, Z.SS(seg.Address + _loadoffset), data.Length);
 				}
 				RegisterSymbols();

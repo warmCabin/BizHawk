@@ -52,7 +52,7 @@ namespace BizHawk.Common.BizInvoke
 		static BizInvoker()
 		{
 			var aname = new AssemblyName("BizInvokeProxyAssembly");
-			ImplAssemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(aname, AssemblyBuilderAccess.Run);
+			ImplAssemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(aname, AssemblyBuilderAccess.Run);
 			ImplModuleBuilder = ImplAssemblyBuilder.DefineDynamicModule("BizInvokerModule");
 		}
 
@@ -176,7 +176,7 @@ namespace BizHawk.Common.BizInvoke
 			var ret = new InvokerImpl
 			{
 				Hooks = postCreateHooks,
-				ImplType = type.CreateType()
+				ImplType = type.CreateTypeInfo()
 			};
 			if (monitor)
 			{
@@ -270,7 +270,7 @@ namespace BizHawk.Common.BizInvoke
 			return (o, dll, adapter) =>
 			{
 				var entryPtr = dll.SafeResolve(entryPointName);
-				var interopDelegate = adapter.GetDelegateForFunctionPointer(entryPtr, delegateType.CreateType());
+				var interopDelegate = adapter.GetDelegateForFunctionPointer(entryPtr, delegateType.CreateTypeInfo());
 				o.GetType().GetField(field.Name).SetValue(o, interopDelegate);
 			};
 		}
@@ -324,9 +324,10 @@ namespace BizHawk.Common.BizInvoke
 			il.Emit(OpCodes.Ldarg_0);
 			il.Emit(OpCodes.Ldfld, field);
 			il.EmitCalli(OpCodes.Calli, 
-				nativeCall, 
+				(CallingConventions)(int)nativeCall, // TODO: this cast seems like a bug in net core.  Report?
 				returnType == typeof(bool) ? typeof(byte) : returnType, // undo winapi style bool garbage
-				nativeParamTypes.ToArray());
+				nativeParamTypes.ToArray(),
+				Type.EmptyTypes);
 
 			if (monitorField != null) // monitor: finally exit
 			{

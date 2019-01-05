@@ -13,7 +13,7 @@ namespace BizHawk.Common
 		{
 			// copy the dll to a temp directory
 			var path = TempFileManager.GetTempFilename(string.Format("{0}", Path.GetFileNameWithoutExtension(dllPath)),".dll",false);
-			using (var stream = new FileStream(path, FileMode.Create, System.Security.AccessControl.FileSystemRights.FullControl, FileShare.ReadWrite | FileShare.Delete, 4 * 1024, FileOptions.None))
+			using (var stream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete, 4 * 1024, FileOptions.None))
 			using (var sdll = File.OpenRead(dllPath))
 				sdll.CopyTo(stream);
 

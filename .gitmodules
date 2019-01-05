@@ -15,3 +15,7 @@
 	path = mgba
 	url = https://github.com/TASVideos/mgba.git
 	branch = bizhawk-0.6
+[submodule "ExternalProjects/PeNet"]
+	path = ExternalProjects/PeNet
+	url = https://github.com/nattthebear/PeNet.git
+	branch = import-thunk-rva

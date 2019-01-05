@@ -67,7 +67,7 @@ namespace BizHawk.Common
 			BlockSize = blocksize;
 			BlockCount = size / BlockSize;
 			Directory.CreateDirectory(Path.GetDirectoryName(path));
-			Stream = new FileStream(path, FileMode.Create, System.Security.AccessControl.FileSystemRights.FullControl, FileShare.None, 4 * 1024, FileOptions.DeleteOnClose);
+			Stream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4 * 1024, FileOptions.DeleteOnClose);
 		}
 
 		/// <summary>

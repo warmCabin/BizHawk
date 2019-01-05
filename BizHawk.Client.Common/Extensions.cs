@@ -2,7 +2,7 @@
 using BizHawk.Bizware.BizwareGL;
 using BizHawk.Bizware.BizwareGL.Drivers.GdiPlus;
 using BizHawk.Bizware.BizwareGL.Drivers.OpenTK;
-using BizHawk.Bizware.BizwareGL.Drivers.SlimDX;
+// using BizHawk.Bizware.BizwareGL.Drivers.SlimDX;
 
 namespace BizHawk.Client.Common
 {
@@ -15,10 +15,10 @@ namespace BizHawk.Client.Common
 				return new GuiRenderer(gl);
 			}
 
-			if (gl is IGL_SlimDX9)
-			{
-				return new GuiRenderer(gl);
-			}
+			// if (gl is IGL_SlimDX9)
+			// {
+			// 	return new GuiRenderer(gl);
+			// }
 
 			if (gl is IGL_GdiPlus)
 			{
