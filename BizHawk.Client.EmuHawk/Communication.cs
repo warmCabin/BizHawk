@@ -416,7 +416,6 @@ namespace BizHawk.Client.EmuHawk
 		//makes all functionalities for providing screenshots available
 		{
 			private IVideoProvider currentVideoProvider = null;
-			private ImageConverter converter = new ImageConverter();
 			public BitmapBuffer MakeScreenShotImage()
 			{
 				if (currentVideoProvider == null)
@@ -427,7 +426,9 @@ namespace BizHawk.Client.EmuHawk
 			}
 			public byte[] ImageToByte(Image img)
 			{
-				return (byte[])converter.ConvertTo(img, typeof(byte[]));
+				var ms = new MemoryStream();
+				img.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+				return ms.ToArray();
 			}
 			public string ImageToString(Image img)
 			{

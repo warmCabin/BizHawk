@@ -655,33 +655,33 @@ namespace BizHawk.Client.EmuHawk
 
 		public void UpdateToolsBefore(bool fromLua = false)
 		{
-			if (Has<LuaConsole>())
-			{
-				if (!fromLua)
-				{
-					LuaConsole.LuaImp.StartLuaDrawing();
-				}
-			}
+			// if (Has<LuaConsole>())
+			// {
+			// 	if (!fromLua)
+			// 	{
+			// 		LuaConsole.LuaImp.StartLuaDrawing();
+			// 	}
+			// }
 
 			UpdateBefore();
 		}
 
 		public void UpdateToolsAfter(bool fromLua = false)
 		{
-			if (!fromLua && Has<LuaConsole>())
-			{
-				LuaConsole.ResumeScripts(true);
-			}
+			// if (!fromLua && Has<LuaConsole>())
+			// {
+			// 	LuaConsole.ResumeScripts(true);
+			// }
 
 			GlobalWin.Tools.UpdateAfter();
 
-			if (Has<LuaConsole>())
-			{
-				if (!fromLua)
-				{
-					LuaConsole.LuaImp.EndLuaDrawing();
-				}
-			}
+			// if (Has<LuaConsole>())
+			// {
+			// 	if (!fromLua)
+			// 	{
+			// 		LuaConsole.LuaImp.EndLuaDrawing();
+			// 	}
+			// }
 		}
 
 		public void FastUpdateBefore()
@@ -699,10 +699,10 @@ namespace BizHawk.Client.EmuHawk
 
 		public void FastUpdateAfter(bool fromLua = false)
 		{
-			if (!fromLua && Global.Config.RunLuaDuringTurbo && Has<LuaConsole>())
-			{
-				LuaConsole.ResumeScripts(true);
-			}
+			// if (!fromLua && Global.Config.RunLuaDuringTurbo && Has<LuaConsole>())
+			// {
+			// 	LuaConsole.ResumeScripts(true);
+			// }
 
 			var afterList = _tools.Where(t => !t.UpdateBefore);
 			foreach (var tool in afterList)
@@ -714,10 +714,10 @@ namespace BizHawk.Client.EmuHawk
 				}
 			}
 
-			if (Global.Config.RunLuaDuringTurbo && Has<LuaConsole>())
-			{
-				LuaConsole.LuaImp.EndLuaDrawing();
-			}
+			// if (Global.Config.RunLuaDuringTurbo && Has<LuaConsole>())
+			// {
+			// 	LuaConsole.LuaImp.EndLuaDrawing();
+			// }
 		}
 
 		public bool IsAvailable<T>()
@@ -732,7 +732,7 @@ namespace BizHawk.Client.EmuHawk
 				return false;
 			}
 
-			if (t == typeof(LuaConsole) && PlatformLinkedLibSingleton.RunningOnUnix) return false;
+			// if (t == typeof(LuaConsole) && PlatformLinkedLibSingleton.RunningOnUnix) return false;
 
 			var tool = Assembly
 					.GetExecutingAssembly()
@@ -915,28 +915,28 @@ namespace BizHawk.Client.EmuHawk
 			}
 		}
 
-		public LuaConsole LuaConsole
-		{
-			get
-			{
-				var tool = _tools.FirstOrDefault(t => t is LuaConsole);
-				if (tool != null)
-				{
-					if (tool.IsDisposed)
-					{
-						_tools.Remove(tool);
-					}
-					else
-					{
-						return tool as LuaConsole;
-					}
-				}
+		// public LuaConsole LuaConsole
+		// {
+		// 	get
+		// 	{
+		// 		var tool = _tools.FirstOrDefault(t => t is LuaConsole);
+		// 		if (tool != null)
+		// 		{
+		// 			if (tool.IsDisposed)
+		// 			{
+		// 				_tools.Remove(tool);
+		// 			}
+		// 			else
+		// 			{
+		// 				return tool as LuaConsole;
+		// 			}
+		// 		}
 
-				var newTool = new LuaConsole();
-				_tools.Add(newTool);
-				return newTool;
-			}
-		}
+		// 		var newTool = new LuaConsole();
+		// 		_tools.Add(newTool);
+		// 		return newTool;
+		// 	}
+		// }
 
 		public TAStudio TAStudio
 		{

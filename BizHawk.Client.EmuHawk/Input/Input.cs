@@ -3,8 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 
-using SlimDX.DirectInput;
-
 using BizHawk.Common;
 using BizHawk.Client.Common;
 
@@ -130,10 +128,10 @@ namespace BizHawk.Client.EmuHawk
 			}
 			else
 			{
-				KeyInput.Initialize();
+				// KeyInput.Initialize();
 				IPCKeyInput.Initialize();
-				GamePad.Initialize();
-				GamePad360.Initialize();
+				// GamePad.Initialize();
+				// GamePad360.Initialize();
 			}
 			Instance = new Input();
 		}
@@ -142,8 +140,8 @@ namespace BizHawk.Client.EmuHawk
 		{
 			if (!PlatformLinkedLibSingleton.RunningOnUnix)
 			{
-				KeyInput.Cleanup();
-				GamePad.Cleanup();
+				// KeyInput.Cleanup();
+				// GamePad.Cleanup();
 			}
 		}
 
@@ -333,15 +331,15 @@ namespace BizHawk.Client.EmuHawk
 			{
 				var keyEvents = PlatformLinkedLibSingleton.RunningOnUnix
 					? OTK_Keyboard.Update()
-					: KeyInput.Update().Concat(IPCKeyInput.Update());
+					: OTK_Keyboard.Update().Concat(IPCKeyInput.Update());
 				if (PlatformLinkedLibSingleton.RunningOnUnix)
 				{
 					//TODO
 				}
 				else
 				{
-					GamePad.UpdateAll();
-					GamePad360.UpdateAll();
+					// GamePad.UpdateAll();
+					// GamePad360.UpdateAll();
 				}
 
 				//this block is going to massively modify data structures that the binding method uses, so we have to lock it all
@@ -358,7 +356,7 @@ namespace BizHawk.Client.EmuHawk
 						//FloatValues.Clear();
 
 						//analyze xinput
-						foreach (var pad in GamePad360.EnumerateDevices())
+						/*foreach (var pad in GamePad360.EnumerateDevices())
 						{
 							string xname = "X" + pad.PlayerNumber + " ";
 							for (int b = 0; b < pad.NumButtons; b++)
@@ -389,7 +387,7 @@ namespace BizHawk.Client.EmuHawk
 									FloatDeltas[n] += Math.Abs(f - FloatValues[n]);
 								FloatValues[n] = f;
 							}
-						}
+						}*/
 
 						// analyse moose
 						// other sorts of mouse api (raw input) could easily be added as a separate listing under a different class
