@@ -328,9 +328,9 @@ namespace BizHawk.Client.EmuHawk
 				case "Trace Logger":
 					GlobalWin.Tools.Load<TraceLogger>();
 					break;
-				case "Lua Console":
-					OpenLuaConsole();
-					break;
+				// case "Lua Console":
+				// 	OpenLuaConsole();
+				// 	break;
 				case "Cheats":
 					GlobalWin.Tools.Load<Cheats>();
 					break;

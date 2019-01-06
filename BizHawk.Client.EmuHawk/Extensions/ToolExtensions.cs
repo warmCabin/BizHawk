@@ -118,11 +118,11 @@ namespace BizHawk.Client.EmuHawk.ToolExtensions
 							var tsmiTest = new ToolStripMenuItem { Text = "&Shell Context Menu" };
 							tsmiTest.Click += (o, ev) =>
 							{
-								var si = new GongSolutions.Shell.ShellItem(hf.FullPathWithoutMember);
-								var scm = new GongSolutions.Shell.ShellContextMenu(si);
-								var tsddi = o as ToolStripDropDownItem;
-								tsddi.Owner.Update();
-								scm.ShowContextMenu(tsddi.Owner, new System.Drawing.Point(0, 0));
+								// var si = new GongSolutions.Shell.ShellItem(hf.FullPathWithoutMember);
+								// var scm = new GongSolutions.Shell.ShellContextMenu(si);
+								// var tsddi = o as ToolStripDropDownItem;
+								// tsddi.Owner.Update();
+								// scm.ShowContextMenu(tsddi.Owner, new System.Drawing.Point(0, 0));
 							};
 							tsdd.Items.Add(tsmiTest);
 

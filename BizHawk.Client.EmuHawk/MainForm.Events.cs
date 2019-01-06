@@ -1386,7 +1386,7 @@ namespace BizHawk.Client.EmuHawk
 			RamSearchMenuItem.ShortcutKeyDisplayString = Global.Config.HotkeyBindings["RAM Search"].Bindings;
 			HexEditorMenuItem.ShortcutKeyDisplayString = Global.Config.HotkeyBindings["Hex Editor"].Bindings;
 			LuaConsoleMenuItem.ShortcutKeyDisplayString = Global.Config.HotkeyBindings["Lua Console"].Bindings;
-			LuaConsoleMenuItem.Enabled = GlobalWin.Tools.IsAvailable<LuaConsole>();
+			// LuaConsoleMenuItem.Enabled = GlobalWin.Tools.IsAvailable<LuaConsole>();
 			CheatsMenuItem.ShortcutKeyDisplayString = Global.Config.HotkeyBindings["Cheats"].Bindings;
 			TAStudioMenuItem.ShortcutKeyDisplayString = Global.Config.HotkeyBindings["TAStudio"].Bindings;
 			VirtualPadMenuItem.ShortcutKeyDisplayString = Global.Config.HotkeyBindings["Virtual Pad"].Bindings;
@@ -1462,7 +1462,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void LuaConsoleMenuItem_Click(object sender, EventArgs e)
 		{
-			OpenLuaConsole();
+		// 	OpenLuaConsole();
 		}
 
 		private void TAStudioMenuItem_Click(object sender, EventArgs e)

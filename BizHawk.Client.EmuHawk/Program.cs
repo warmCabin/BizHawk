@@ -103,7 +103,7 @@ namespace BizHawk.Client.EmuHawk
 					{
 						try
 						{
-							new SingleInstanceController(args).Run(args);
+							// new SingleInstanceController(args).Run(args);
 						}
 						catch (ObjectDisposedException)
 						{
@@ -271,19 +271,19 @@ namespace BizHawk.Client.EmuHawk
 				GlobalWin.GL = new Bizware.BizwareGL.Drivers.GdiPlus.IGL_GdiPlus();
 			else if (Global.Config.DispMethod == Config.EDispMethod.SlimDX9)
 			{
-				try
-				{
-					GlobalWin.GL = new Bizware.BizwareGL.Drivers.SlimDX.IGL_SlimDX9();
-				}
-				catch(Exception ex)
-				{
-					var e2 = new Exception("Initialization of Direct3d 9 Display Method failed; falling back to GDI+", ex);
-					new ExceptionBox(e2).ShowDialog();
+				// try
+				// {
+				// 	GlobalWin.GL = new Bizware.BizwareGL.Drivers.SlimDX.IGL_SlimDX9();
+				// }
+				// catch(Exception ex)
+				// {
+					// var e2 = new Exception("Initialization of Direct3d 9 Display Method failed; falling back to GDI+", ex);
+					// new ExceptionBox(e2).ShowDialog();
 
 					// fallback
 					Global.Config.DispMethod = Config.EDispMethod.GdiPlus;
 					goto REDO_DISPMETHOD;
-				}
+				// }
 			}
 			else
 			{
@@ -422,7 +422,7 @@ namespace BizHawk.Client.EmuHawk
 			}
 		}
 
-#if WINDOWS
+#if false
 		public class SingleInstanceController : WindowsFormsApplicationBase
 		{
 			readonly string[] cmdArgs;

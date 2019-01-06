@@ -378,15 +378,15 @@ namespace BizHawk.Client.EmuHawk
 			}
 
 			//start Lua Console if requested in the command line arguments
-			if (argParser.luaConsole)
-			{
-				GlobalWin.Tools.Load<LuaConsole>();
-			}
-			//load Lua Script if requested in the command line arguments
-			if (argParser.luaScript != null)
-			{
-				GlobalWin.Tools.LuaConsole.LoadLuaFile(argParser.luaScript);
-			}
+			// if (argParser.luaConsole)
+			// {
+			// 	GlobalWin.Tools.Load<LuaConsole>();
+			// }
+			// //load Lua Script if requested in the command line arguments
+			// if (argParser.luaScript != null)
+			// {
+			// 	GlobalWin.Tools.LuaConsole.LoadLuaFile(argParser.luaScript);
+			// }
 
 			GlobalWin.Tools.AutoLoad();
 
@@ -475,10 +475,10 @@ namespace BizHawk.Client.EmuHawk
 				// autohold/autofire must not be affected by the following inputs
 				Global.ActiveController.Overrides(Global.LuaAndAdaptor);
 
-				if (GlobalWin.Tools.Has<LuaConsole>() && !SuppressLua)
-				{
-					GlobalWin.Tools.LuaConsole.ResumeScripts(false);
-				}
+				// if (GlobalWin.Tools.Has<LuaConsole>() && !SuppressLua)
+				// {
+				// 	GlobalWin.Tools.LuaConsole.ResumeScripts(false);
+				// }
 
 				StepRunLoop_Core();
 				StepRunLoop_Throttle();
@@ -883,8 +883,9 @@ namespace BizHawk.Client.EmuHawk
 			{
 				using (var img = bb.ToSysdrawingBitmap())
 				{
-					ImageConverter converter = new ImageConverter();
-					return (byte[])converter.ConvertTo(img, typeof(byte[]));
+					var ms = new MemoryStream();
+					img.Save(ms, ImageFormat.Bmp);
+					return ms.ToArray();
 				}
 			}
 		}
@@ -1117,10 +1118,10 @@ namespace BizHawk.Client.EmuHawk
 			}
 		}
 
-		private void OpenLuaConsole()
-		{
-			GlobalWin.Tools.Load<LuaConsole>();
-		}
+		// private void OpenLuaConsole()
+		// {
+		// 	GlobalWin.Tools.Load<LuaConsole>();
+		// }
 
 		public void NotifyLogWindowClosing()
 		{
@@ -2743,8 +2744,8 @@ namespace BizHawk.Client.EmuHawk
 			switch (m.Msg)
 			{
 				case WmDevicechange:
-					GamePad.Initialize();
-					GamePad360.Initialize();
+					// GamePad.Initialize();
+					// GamePad360.Initialize();
 					break;
 			}
 
@@ -2936,10 +2937,10 @@ namespace BizHawk.Client.EmuHawk
 				Global.ClickyVirtualPadController.FrameTick();
 				Global.LuaAndAdaptor.FrameTick();
 
-				if (GlobalWin.Tools.Has<LuaConsole>() && !SuppressLua)
-				{
-					GlobalWin.Tools.LuaConsole.LuaImp.CallFrameBeforeEvent();
-				}
+				// if (GlobalWin.Tools.Has<LuaConsole>() && !SuppressLua)
+				// {
+				// 	GlobalWin.Tools.LuaConsole.LuaImp.CallFrameBeforeEvent();
+				// }
 
 				if (IsTurboing)
 				{
@@ -3022,10 +3023,10 @@ namespace BizHawk.Client.EmuHawk
 
 				PressFrameAdvance = false;
 
-				if (GlobalWin.Tools.Has<LuaConsole>() && !SuppressLua)
-				{
-					GlobalWin.Tools.LuaConsole.LuaImp.CallFrameAfterEvent();
-				}
+				// if (GlobalWin.Tools.Has<LuaConsole>() && !SuppressLua)
+				// {
+				// 	GlobalWin.Tools.LuaConsole.LuaImp.CallFrameAfterEvent();
+				// }
 
 				if (IsTurboing)
 				{
@@ -3777,10 +3778,10 @@ namespace BizHawk.Client.EmuHawk
 
 					// restarts the lua console if a different rom is loaded.
 					// im not really a fan of how this is done..
-					if (Global.Config.RecentRoms.Empty || Global.Config.RecentRoms.MostRecent != loaderName)
-					{
-						GlobalWin.Tools.Restart<LuaConsole>();
-					}
+					// if (Global.Config.RecentRoms.Empty || Global.Config.RecentRoms.MostRecent != loaderName)
+					// {
+					// 	GlobalWin.Tools.Restart<LuaConsole>();
+					// }
 
 					Global.Config.RecentRoms.Add(loaderName);
 					JumpLists.AddRecentItem(loaderName, ioa.DisplayName);
@@ -4063,10 +4064,10 @@ namespace BizHawk.Client.EmuHawk
 				GlobalWin.OSD.ClearGUIText();
 				ClientApi.OnStateLoaded(this, userFriendlyStateName);
 
-				if (GlobalWin.Tools.Has<LuaConsole>())
-				{
-					GlobalWin.Tools.LuaConsole.LuaImp.CallLoadStateEvent(userFriendlyStateName);
-				}
+				// if (GlobalWin.Tools.Has<LuaConsole>())
+				// {
+				// 	GlobalWin.Tools.LuaConsole.LuaImp.CallLoadStateEvent(userFriendlyStateName);
+				// }
 
 				SetMainformMovieInfo();
 				GlobalWin.Tools.UpdateToolsBefore(fromLua);
@@ -4192,10 +4193,10 @@ namespace BizHawk.Client.EmuHawk
 
 			SaveState(path, quickSlotName, false);
 
-			if (GlobalWin.Tools.Has<LuaConsole>())
-			{
-				GlobalWin.Tools.LuaConsole.LuaImp.CallSaveStateEvent(quickSlotName);
-			}
+			// if (GlobalWin.Tools.Has<LuaConsole>())
+			// {
+			// 	GlobalWin.Tools.LuaConsole.LuaImp.CallSaveStateEvent(quickSlotName);
+			// }
 		}
 
 		private void SaveStateAs()

@@ -1,15 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
 
-// TODO: The only thing that uses this is DynamicLibraryImportResolver, and mupen (which should be using BizInvoker anyway)
-// delete this and roll the functionality into DynamicLibraryImportResolver
-#if EXE_PROJECT
 namespace EXE_PROJECT
-#else
-namespace BizHawk.Common
-#endif
 {
-
     public sealed class PlatformLinkedLibSingleton
     {
         public static readonly bool RunningOnUnix = Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX;

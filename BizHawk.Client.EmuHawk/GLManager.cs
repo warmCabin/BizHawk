@@ -77,11 +77,11 @@ namespace BizHawk.Client.EmuHawk
 			bool begun = false;
 
 			//this needs a begin signal to set the swap chain to the next backbuffer
-			if (cr.gl is BizHawk.Bizware.BizwareGL.Drivers.SlimDX.IGL_SlimDX9)
-			{
-				cr.gc.Begin();
-				begun = true;
-			}
+			// if (cr.gl is BizHawk.Bizware.BizwareGL.Drivers.SlimDX.IGL_SlimDX9)
+			// {
+			// 	cr.gc.Begin();
+			// 	begun = true;
+			// }
 
 			if (cr == ActiveContext)
 				return;

@@ -118,20 +118,20 @@ namespace BizHawk.Client.EmuHawk
 
 		private void _LoadLuaFile(string filename, string archive = null)
 		{
-			OpenLuaConsole();
-			if (GlobalWin.Tools.Has<LuaConsole>())
-			{
-				GlobalWin.Tools.LuaConsole.LoadLuaFile(filename);
-			}
+			// OpenLuaConsole();
+			// if (GlobalWin.Tools.Has<LuaConsole>())
+			// {
+			// 	GlobalWin.Tools.LuaConsole.LoadLuaFile(filename);
+			// }
 		}
 
 		private void _LoadLuaSession(string filename, string archive = null)
 		{
-			OpenLuaConsole();
-			if (GlobalWin.Tools.Has<LuaConsole>())
-			{
-				GlobalWin.Tools.LuaConsole.LoadLuaSession(filename);
-			}
+			// OpenLuaConsole();
+			// if (GlobalWin.Tools.Has<LuaConsole>())
+			// {
+			// 	GlobalWin.Tools.LuaConsole.LoadLuaSession(filename);
+			// }
 		}
 
 		private void _LoadMovie(string filename, string archive = null)
