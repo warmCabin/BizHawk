@@ -32,6 +32,7 @@
 		NeoGeoPocket,
         ZXSpectrum,
         AmstradCPC,
-		GGL
+		GGL,
+		VIC20
 	}
 }

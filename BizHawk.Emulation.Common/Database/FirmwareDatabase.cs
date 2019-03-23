@@ -31,6 +31,8 @@ namespace BizHawk.Emulation.Common
 			FirmwareAndOption("A3AF676991391A6DD716C79022D4947206B78164", 4096, "A78", "Bios_HSC", "7800highscore.bin", "Highscore Bios");
 			FirmwareAndOption("45BEDC4CBDEAC66C7DF59E9E599195C778D86A92", 8192, "Coleco", "Bios", "ColecoBios.bin", "Bios");
 
+			//FirmwareAndOption("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 8192, "VIC20", "Bios", "VIC20Bios.bin", "Bios");
+
 			var gbaNormal = File("300C20DF6731A33952DED8C436F7F186D25D3492", 16384, "gbabios.rom", "Bios (World)");
 			var gbaJDebug = File("AA98A2AD32B86106340665D1222D7D973A1361C7", 16384, "gbabios.rom", "Bios (J Debug)");
 			Firmware("GBA", "Bios", "Bios");

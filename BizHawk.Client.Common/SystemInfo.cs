@@ -69,6 +69,11 @@ namespace BizHawk.Client.Common
 		public static SystemInfo C64 { get; } = new SystemInfo("Commodore 64", CoreSystem.Commodore64, 1);
 
 		/// <summary>
+		/// Gets the <see cref="SystemInfo"/> instance for Commodore 64
+		/// </summary>
+		public static SystemInfo VIC20 { get; } = new SystemInfo("VIC 20", CoreSystem.VIC20, 1);
+
+		/// <summary>
 		/// Gets the <see cref="SystemInfo"/> instance for Coleco Vision
 		/// </summary>
 		public static SystemInfo Coleco { get; } = new SystemInfo("ColecoVision", CoreSystem.ColecoVision, 1);

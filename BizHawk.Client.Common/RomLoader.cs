@@ -22,6 +22,7 @@ using BizHawk.Emulation.Cores.Sega.Saturn;
 using BizHawk.Emulation.Cores.Sony.PSP;
 using BizHawk.Emulation.Cores.Sony.PSX;
 using BizHawk.Emulation.Cores.Computers.SinclairSpectrum;
+using BizHawk.Emulation.Cores.Computers.VIC20;
 using BizHawk.Emulation.DiscSystem;
 
 using GPGX64 = BizHawk.Emulation.Cores.Consoles.Sega.gpgx;

@@ -316,6 +316,39 @@
     <Compile Include="Computers\Commodore64\MOS\Vic.VideoProvider.cs" />
     <Compile Include="Computers\Commodore64\SaveState.cs" />
     <Compile Include="Computers\Commodore64\User\UserPortDevice.cs" />
+    <Compile Include="Computers\VIC20\Audio.cs" />
+    <Compile Include="Computers\VIC20\VIC20.CpuLink.cs" />
+    <Compile Include="Computers\VIC20\VIC20Hawk.cs" />
+    <Compile Include="Computers\VIC20\VIC20Hawk.ICodeDataLog.cs" />
+    <Compile Include="Computers\VIC20\VIC20Hawk.IDebuggable.cs">
+      <DependentUpon>VIC20Hawk.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Computers\VIC20\VIC20Hawk.IEmulator.cs">
+      <DependentUpon>VIC20Hawk.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Computers\VIC20\VIC20Hawk.IInputPollable.cs">
+      <DependentUpon>VIC20Hawk.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Computers\VIC20\VIC20Hawk.IMemoryDomains.cs">
+      <DependentUpon>VIC20Hawk.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Computers\VIC20\VIC20Hawk.ISaveRam.cs">
+      <DependentUpon>VIC20Hawk.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Computers\VIC20\VIC20Hawk.ISettable.cs">
+      <DependentUpon>VIC20Hawk.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Computers\VIC20\VIC20Hawk.IStatable.cs">
+      <DependentUpon>VIC20Hawk.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Computers\VIC20\VIC20HawkControllerDeck.cs" />
+    <Compile Include="Computers\VIC20\VIC20HawkControllers.cs" />
+    <Compile Include="Computers\VIC20\HW_Registers.cs" />
+    <Compile Include="Computers\VIC20\Mappers\MapperBase.cs" />
+    <Compile Include="Computers\VIC20\Mappers\Mapper_Default.cs" />
+    <Compile Include="Computers\VIC20\MemoryMap.cs" />
+    <Compile Include="Computers\VIC20\PPU.cs" />
+    <Compile Include="Computers\VIC20\SerialPort.cs" />
     <Compile Include="Computers\SinclairSpectrum\Hardware\Abstraction\IFDDHost.cs" />
     <Compile Include="Computers\SinclairSpectrum\Hardware\Input\StandardKeyboard.cs" />
     <Compile Include="Computers\SinclairSpectrum\Hardware\SoundOuput\AY38912.cs" />
