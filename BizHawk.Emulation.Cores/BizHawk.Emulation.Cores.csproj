@@ -1700,6 +1700,7 @@
     <None Include="Consoles\Nintendo\NES\Docs\MapperCompatibilityList.url" />
     <None Include="Consoles\Nintendo\NES\Docs\nesasm.pdf" />
     <Compile Include="Consoles\Nintendo\NES\NES.CpuLink.cs" />
+    <None Include="packages.config" />
     <None Include="Resources\128.ROM.gz" />
     <None Include="Resources\48.ROM.gz" />
     <None Include="Resources\cgb_boot.bin.gz" />
@@ -1717,7 +1718,13 @@
     <None Include="Resources\Spectrum3_V4-0_ROM2.bin.gz" />
     <None Include="Resources\Spectrum3_V4-0_ROM3.bin.gz" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="../.stylecop.json" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent Condition=" '$(OS)' == 'Windows_NT' ">"$(SolutionDir)subwcrev.bat" "$(ProjectDir)"</PreBuildEvent>
