@@ -79,6 +79,9 @@ namespace BizHawk.Client.EmuHawk
 				DenoteStatesWithBGColor = true;
 				DenoteMarkersWithIcons = false;
 				DenoteMarkersWithBGColor = true;
+
+				FontHeight = 8;
+				FontWidth = 6;
 			}
 
 			public RecentFiles RecentTas { get; set; }
@@ -106,6 +109,8 @@ namespace BizHawk.Client.EmuHawk
 			public bool DenoteMarkersWithBGColor { get; set; }
 			public int MainVerticalSplitDistance { get; set; }
 			public int BranchMarkerSplitDistance { get; set; }
+			public int FontHeight { get; set; }
+			public int FontWidth { get; set; }
 		}
 
 		#region Initializing
@@ -260,6 +265,11 @@ namespace BizHawk.Client.EmuHawk
 			TasView.ScrollMethod = Settings.FollowCursorScrollMethod;
 			TasView.SeekingCutoffInterval = Settings.SeekingCutoffInterval;
 			BookMarkControl.HoverInterval = Settings.BranchCellHoverInterval;
+
+			TasView.FontHeight = BookMarkControl.BranchInputRoll.FontHeight = 
+				MarkerControl.MarkerInputRoll.FontHeight = Settings.FontHeight;
+			TasView.FontWidth = BookMarkControl.BranchInputRoll.FontWidth = 
+				MarkerControl.MarkerInputRoll.FontWidth = Settings.FontWidth;
 
 			_autosaveTimer = new Timer(components);
 			_autosaveTimer.Tick += AutosaveTimerEventProcessor;
@@ -450,8 +460,8 @@ namespace BizHawk.Client.EmuHawk
 		private void SetUpColumns()
 		{
 			TasView.AllColumns.Clear();
-			AddColumn(CursorColumnName, "", 18);
-			AddColumn(FrameColumnName, "Frame#", 68);
+			AddColumn(CursorColumnName, "", 1);
+			AddColumn(FrameColumnName, "Frame#", 16);
 
 			var columnNames = GenerateColumnNames();
 			foreach (var kvp in columnNames)
@@ -471,7 +481,7 @@ namespace BizHawk.Client.EmuHawk
 					digits = kvp.Value.Length;
 				}
 
-				AddColumn(kvp.Key, kvp.Value, (digits * 6) + 14, type); // magic numbers reused in EditBranchTextPopUp()
+				AddColumn(kvp.Key, kvp.Value, digits, type); // magic numbers reused in EditBranchTextPopUp()
 			}
 
 			var columnsToHide = TasView.AllColumns
@@ -534,7 +544,7 @@ namespace BizHawk.Client.EmuHawk
 			SetUpToolStripColumns();
 		}
 
-		public void AddColumn(string columnName, string columnText, int columnWidth, InputRoll.RollColumn.InputType columnType = InputRoll.RollColumn.InputType.Boolean)
+		public void AddColumn(string columnName, string columnText, int minDigits = 1, InputRoll.RollColumn.InputType columnType = InputRoll.RollColumn.InputType.Boolean)
 		{
 			if (TasView.AllColumns[columnName] == null)
 			{
@@ -542,7 +552,7 @@ namespace BizHawk.Client.EmuHawk
 				{
 					Name = columnName,
 					Text = columnText,
-					Width = columnWidth,
+					Width = minDigits * TasView.CellWidthPadding + TasView.CellWidth,
 					Type = columnType
 				};
 
@@ -1225,11 +1235,6 @@ namespace BizHawk.Client.EmuHawk
 		protected void DragEnterWrapper(object sender, DragEventArgs e)
 		{
 			base.GenericDragEnter(sender, e);
-		}
-
-		private void TasPlaybackBox_Load(object sender, EventArgs e)
-		{
-
 		}
 	}
 }

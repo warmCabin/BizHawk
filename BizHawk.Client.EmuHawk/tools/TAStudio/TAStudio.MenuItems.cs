@@ -1158,6 +1158,56 @@ namespace BizHawk.Client.EmuHawk
 			}
 		}
 
+		private void setHeightToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			using (var prompt = new InputPrompt
+			{
+				TextInputType = InputPrompt.InputType.Unsigned,
+				Message = "InputRoll Font Height",
+				InitialValue = TasView.FontHeight.ToString()
+			})
+			{
+				DialogResult result = prompt.ShowDialog();
+				if (result == DialogResult.OK)
+				{
+					int val = int.Parse(prompt.PromptText);
+					if (val > 0)
+					{
+						Settings.FontHeight =
+						TasView.FontHeight = 
+						MarkerControl.MarkerInputRoll.FontHeight =
+						BookMarkControl.BranchInputRoll.FontHeight = 
+							val;
+					}
+				}
+			}
+		}
+
+		private void setWidthToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			using (var prompt = new InputPrompt
+			{
+				TextInputType = InputPrompt.InputType.Unsigned,
+				Message = "InputRoll Font Width",
+				InitialValue = TasView.FontWidth.ToString()
+			})
+			{
+				DialogResult result = prompt.ShowDialog();
+				if (result == DialogResult.OK)
+				{
+					int val = int.Parse(prompt.PromptText);
+					if (val > 0)
+					{
+						Settings.FontWidth =
+						TasView.FontWidth =
+						MarkerControl.MarkerInputRoll.FontWidth =
+						BookMarkControl.BranchInputRoll.FontWidth =
+							val;
+					}
+				}
+			}
+		}
+
 		private void RotateMenuItem_Click(object sender, EventArgs e)
 		{
 			TasView.HorizontalOrientation ^= true;

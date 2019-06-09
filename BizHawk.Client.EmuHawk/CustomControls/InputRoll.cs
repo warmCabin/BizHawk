@@ -54,13 +54,14 @@ namespace BizHawk.Client.EmuHawk
 		{
 			UseCustomBackground = true;
 			GridLines = true;
-			CellWidthPadding = 3;
+			FontHeight = 8;
+			FontWidth = 6;
 			CellHeightPadding = 0;
 			CurrentCell = null;
 			ScrollMethod = "near";
 
-			var commonFont = new Font("Arial", 8, FontStyle.Bold);
-			_normalFont = GDIRenderer.CreateNormalHFont(commonFont, 6);
+			var commonFont = new Font("Arial", FontHeight, FontStyle.Bold);
+			_normalFont = GDIRenderer.CreateNormalHFont(commonFont, FontWidth);
 
 			// PrepDrawString doesn't actually set the font, so this is rather useless.
 			// I'm leaving this stuff as-is so it will be a bit easier to fix up with another rendering method.
@@ -137,11 +138,25 @@ namespace BizHawk.Client.EmuHawk
 		#region Properties
 
 		/// <summary>
+		/// Gets or sets the font height
+		/// </summary>
+		[DefaultValue(8)]
+		[Category("Behavior")]
+		public new int FontHeight { get; set; }
+
+		/// <summary>
+		/// Gets or sets the font height
+		/// </summary>
+		[DefaultValue(6)]
+		[Category("Behavior")]
+		public int FontWidth { get; set; }
+
+		/// <summary>
 		/// Gets or sets the amount of left and right padding on the text inside a cell
 		/// </summary>
 		[DefaultValue(3)]
 		[Category("Behavior")]
-		public int CellWidthPadding { get; set; }
+		public int CellWidthPadding => FontWidth / 2;
 
 		/// <summary>
 		/// Gets or sets the amount of top and bottom padding on the text inside a cell
@@ -1546,7 +1561,7 @@ namespace BizHawk.Client.EmuHawk
 			RecalculateScrollBars();
 			if (_columns.VisibleColumns.Any())
 			{
-				ColumnWidth = _columns.VisibleColumns.Max(c => c.Width.Value) + CellWidthPadding * 4;
+				ColumnWidth = _columns.VisibleColumns.Max(c => c.Width.Value) + CellWidthPadding * 3;
 			}
 		}
 
@@ -1799,7 +1814,7 @@ namespace BizHawk.Client.EmuHawk
 		/// <returns>The new width of the RollColumn object.</returns>
 		private int UpdateWidth(RollColumn col)
 		{
-			col.Width = (col.Text.Length * _charSize.Width) + (CellWidthPadding * 4);
+			col.Width = (col.Text.Length * _charSize.Width) + (CellWidthPadding * 3);
 			return col.Width.Value;
 		}
 
@@ -1872,10 +1887,10 @@ namespace BizHawk.Client.EmuHawk
 		private int ColumnWidth { get; set; }
 
 		// The height of a column cell in Vertical Orientation.
-		private int ColumnHeight { get; set; }
+		public int ColumnHeight { get; private set; }
 
 		// The width of a cell in Horizontal Orientation. Only can be changed by changing the Font or CellPadding.
-		private int CellWidth { get; set; }
+		public int CellWidth { get; private set; }
 
 		[Browsable(false)]
 		public int RowHeight => CellHeight;
@@ -1891,7 +1906,7 @@ namespace BizHawk.Client.EmuHawk
 		private void UpdateCellSize()
 		{
 			CellHeight = _charSize.Height + (CellHeightPadding * 2);
-			CellWidth = (_charSize.Width * MaxCharactersInHorizontal) + (CellWidthPadding * 4); // Double the padding for horizontal because it looks better
+			CellWidth = (_charSize.Width * MaxCharactersInHorizontal) + (CellWidthPadding * 3); // Double the padding for horizontal because it looks better
 		}
 
 		// SuuperW: Count lag frames between FirstDisplayed and given display position

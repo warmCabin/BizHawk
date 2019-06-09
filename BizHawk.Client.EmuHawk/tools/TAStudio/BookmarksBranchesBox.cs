@@ -19,6 +19,7 @@ namespace BizHawk.Client.EmuHawk
 		private readonly ScreenshotForm Screenshot = new ScreenshotForm();
 
 		private TasMovie Movie => Tastudio.CurrentTasMovie;
+		public InputRoll BranchInputRoll => BranchView;
 		private TasBranch _backupBranch;
 		private BranchUndo _branchUndo = BranchUndo.None;
 		private int LongestBranchText = 0;
@@ -67,19 +68,19 @@ namespace BizHawk.Client.EmuHawk
 				{
 					Name = BranchNumberColumnName,
 					Text = "#",
-					Width = 30
+					Width = 3 * BranchView.CellWidthPadding + BranchView.CellWidth
 				},
 				new InputRoll.RollColumn
 				{
 					Name = FrameColumnName,
 					Text = "Frame",
-					Width = 64
+					Width = 14 * BranchView.CellWidthPadding + BranchView.CellWidth
 				},
 				new InputRoll.RollColumn
 				{
 					Name = UserTextColumnName,
 					Text = "UserText",
-					Width = 90
+					Width = 14 * BranchView.CellWidthPadding + BranchView.CellWidth
 				},
 			});
 
@@ -537,7 +538,6 @@ namespace BizHawk.Client.EmuHawk
 
 		public void UpdateTextColumnWidth()
 		{
-			int temp = 0;
 			foreach (TasBranch b in Movie.Branches)
 			{
 				if (string.IsNullOrEmpty(b.UserText))
@@ -545,21 +545,19 @@ namespace BizHawk.Client.EmuHawk
 					continue;
 				}
 
-				if (temp < b.UserText.Length)
+				if (LongestBranchText < b.UserText.Length)
 				{
-					temp = b.UserText.Length;
+					LongestBranchText = b.UserText.Length;
 				}
 			}
 
-			LongestBranchText = temp;
-
-			int textWidth = (LongestBranchText * 12) + 14; // sorry for magic numbers. see TAStudio.SetUpColumns()
-			var column = BranchView.AllColumns.Single(c => c.Name == UserTextColumnName);
-
-			if (textWidth < 90)
+			if (LongestBranchText < 14)
 			{
-				textWidth = 90;
+				LongestBranchText = 14;
 			}
+
+			int textWidth = LongestBranchText * BranchView.CellWidthPadding * 2 + BranchView.CellWidth;
+			var column = BranchView.AllColumns.Single(c => c.Name == UserTextColumnName);
 
 			if (column.Width != textWidth)
 			{

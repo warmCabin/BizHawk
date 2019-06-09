@@ -583,11 +583,11 @@ namespace BizHawk.Client.EmuHawk
 		}
 
 		[LuaMethod("addcolumn", "")]
-		public void AddColumn(string name, string text, int width)
+		public void AddColumn(string name, string text, int minDigits)
 		{
 			if (Engaged())
 			{
-				Tastudio.AddColumn(name, text, width, InputRoll.RollColumn.InputType.Text);
+				Tastudio.AddColumn(name, text, minDigits, InputRoll.RollColumn.InputType.Text);
 			}
 		}
 	}
