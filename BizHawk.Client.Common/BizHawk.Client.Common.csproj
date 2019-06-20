@@ -143,6 +143,7 @@
     <Compile Include="inputAdapters\SimpleController.cs" />
     <Compile Include="inputAdapters\UDLRController.cs" />
     <Compile Include="input\PolarRectConversion.cs" />
+    <Compile Include="input\PolarRectConversionData.cs" />
     <Compile Include="IonicZipWriter.cs" />
     <Compile Include="IPS.cs" />
     <Compile Include="IZipWriter.cs" />

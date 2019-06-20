@@ -181,14 +181,9 @@ namespace BizHawk.Client.EmuHawk
 			ManualX.ValueChanged -= ManualXY_ValueChanged; //TODO is setting and checking a bool faster than subscription?
 			ManualY.ValueChanged -= ManualXY_ValueChanged;
 
-			var rect = PolarRectConversion.PolarDegToRect((double) manualR.Value, (double) manualTheta.Value);
-			rect = new Tuple<double, double>(
-				rangeAverageX + Math.Ceiling(rect.Item1).Clamp(-127, 127),
-				rangeAverageY + Math.Ceiling(rect.Item2).Clamp(-127, 127));
-			ManualX.Value = (decimal) rect.Item1;
-			ManualY.Value = (decimal) rect.Item2;
-			AnalogStick.X = (int) rect.Item1;
-			AnalogStick.Y = (int) rect.Item2;
+			var rect = PolarRectConversion.PolarToRectLookup((ushort) manualR.Value, (ushort) manualTheta.Value);
+			ManualX.Value = AnalogStick.X = (rangeAverageX + rect.Item1).Clamp(-127, 127); //TODO should be -128..127?
+			ManualY.Value = AnalogStick.Y = (rangeAverageY + rect.Item2).Clamp(-127, 127);
 			AnalogStick.HasValue = true;
 			AnalogStick.Refresh();
 
@@ -240,9 +235,9 @@ namespace BizHawk.Client.EmuHawk
 			manualR.ValueChanged -= PolarNumeric_Changed;
 			manualTheta.ValueChanged -= PolarNumeric_Changed;
 
-			var polar = PolarRectConversion.RectToPolarDeg(AnalogStick.X - rangeAverageX, AnalogStick.Y - rangeAverageY);
-			manualR.Value = (decimal) polar.Item1;
-			manualTheta.Value = (decimal) polar.Item2;
+			var polar = PolarRectConversion.RectToPolarLookup((sbyte) (AnalogStick.X - rangeAverageX), (sbyte) (AnalogStick.Y - rangeAverageY));
+			manualR.Value = polar.Item1;
+			manualTheta.Value = polar.Item2;
 
 			manualR.ValueChanged += PolarNumeric_Changed;
 			manualTheta.ValueChanged += PolarNumeric_Changed;

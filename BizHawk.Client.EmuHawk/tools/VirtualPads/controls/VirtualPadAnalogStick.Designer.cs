@@ -171,10 +171,9 @@
 			// manualR
 			// 
 			this.manualR.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.manualR.DecimalPlaces = 2;
 			this.manualR.Location = new System.Drawing.Point(193, 58);
 			this.manualR.Maximum = new decimal(new int[] {
-            182,
+            181,
             0,
             0,
             0});
@@ -185,10 +184,9 @@
 			// manualTheta
 			// 
 			this.manualTheta.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.manualTheta.DecimalPlaces = 2;
 			this.manualTheta.Location = new System.Drawing.Point(193, 84);
 			this.manualTheta.Maximum = new decimal(new int[] {
-            360,
+            359,
             0,
             0,
             0});
