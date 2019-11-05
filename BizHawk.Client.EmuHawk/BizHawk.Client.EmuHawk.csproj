@@ -77,6 +77,7 @@
     <Reference Include="Microsoft.CSharp" />
     <!--<Reference Include="Microsoft.VisualBasic" Condition=" '$(OS)' == 'Windows_NT' " />-->
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\References\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -93,6 +94,10 @@
       <HintPath>..\References\x64\SlimDX.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+      <HintPath>..\packages\System.Buffers.4.5.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -605,6 +610,21 @@
     <Compile Include="CustomControls\MsgBox.designer.cs">
       <DependentUpon>MsgBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="CustomControls\NETCoreFolderBrowser\AssemblyRef.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\CoTaskMemSafeHandle.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\ExternDll.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\FileDialog_Vista_Interop.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\NETCoreFolderBrowserDialog.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\Interop.HRESULT.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\Interop.Libraries.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\Interop.MAX_PATH.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\Interop.MAX_UNICODESTRING_LEN.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\Interop.SHBrowseForFolder.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\Interop.SHGetPathFromIDListLongPath.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\Interop.SHGetSpecialFolderLocation.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\NativeMethods.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\SpecialFolderEnumConverter.cs" />
+    <Compile Include="CustomControls\NETCoreFolderBrowser\UnsafeNativeMethods.cs" />
     <Compile Include="CustomControls\PrereqsAlert.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1852,6 +1872,7 @@
   <ItemGroup>
     <None Include="images\StopButton.png" />
     <None Include="images\mame.png" />
+    <None Include="packages.config" />
     <None Include="Resources\MoveTop.png" />
     <None Include="Resources\MoveBottom.png" />
     <None Include="Resources\MoveTop.bmp" />
