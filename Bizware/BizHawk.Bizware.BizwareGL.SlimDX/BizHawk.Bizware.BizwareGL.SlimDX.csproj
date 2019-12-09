@@ -43,8 +43,9 @@
       <HintPath>../packages/OpenTK.3.0.1/lib/net20/OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SlimDX">
-      <HintPath>..\..\References\x64\SlimDX.dll</HintPath>
+    <Reference Include="SlimDX, Version=4.0.13.43, Culture=neutral, PublicKeyToken=b1b0c32fd1ffe4f9">
+      <HintPath>../../packages/SlimDX.4.0.13.43/lib/NET40/SlimDX.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
