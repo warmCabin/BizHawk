@@ -106,28 +106,17 @@ namespace BizHawk.Bizware.BizwareGL
 			float time = DateTime.Now.Second + (float)DateTime.Now.Millisecond / 1000;
 			Pipeline["Time"].Set(time);
 
-			int w = OutputSize.Width;
-			int h = OutputSize.Height;
-			float v0,v1;
-			if (flip) { v0 = 1; v1 = 0; }
-			else { v0 = 0; v1 = 1; }
-			float* pData = stackalloc float[10*4];
-			int i=0;
-			pData[i++] = 0; pData[i++] = 0; pData[i++] = 0; pData[i++] = 1; //topleft vert
-			pData[i++] = 0; pData[i++] = 0; pData[i++] = 0; pData[i++] = 0; //useless color
-			pData[i++] = 0; pData[i++] = v0;
-			pData[i++] = w; pData[i++] = 0; pData[i++] = 0; pData[i++] = 1; //topright vert
-			pData[i++] = 0; pData[i++] = 0; pData[i++] = 0; pData[i++] = 0; //useless color
-			pData[i++] = 1; pData[i++] = v0;
-			pData[i++] = 0; pData[i++] = h; pData[i++] = 0; pData[i++] = 1; //bottomleft vert
-			pData[i++] = 0; pData[i++] = 0; pData[i++] = 0; pData[i++] = 0; //useless color
-			pData[i++] = 0; pData[i++] = v1;
-			pData[i++] = w; pData[i++] = h; pData[i++] = 0; pData[i++] = 1; //bottomright vert
-			pData[i++] = 0; pData[i++] = 0; pData[i++] = 0; pData[i++] = 0; //useless color
-			pData[i++] = 1; pData[i++] = v1;
-
 			Owner.SetBlendState(Owner.BlendNoneCopy);
-			Owner.BindArrayData(pData);
+			var w = OutputSize.Width;
+			var h = OutputSize.Height;
+			var v0 = flip ? 1.0f : 0.0f;
+			var v1 = flip ? 0.0f : 1.0f;
+			Owner.BindArrayData(new[] {
+				new RetroShaderVertexData(0, 0, 0, 1, 0, 0, 0, 0, 0, v0),
+				new RetroShaderVertexData(w, 0, 0, 1, 0, 0, 0, 0, 1, v0),
+				new RetroShaderVertexData(0, h, 0, 1, 0, 0, 0, 0, 0, v1),
+				new RetroShaderVertexData(w, h, 0, 1, 0, 0, 0, 0, 1, v1)
+			});
 			Owner.DrawArrays(PrimitiveType.TriangleStrip, 4);
 		}
 

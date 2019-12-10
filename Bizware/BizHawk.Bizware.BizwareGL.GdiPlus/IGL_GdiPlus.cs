@@ -55,7 +55,7 @@ namespace BizHawk.Bizware.BizwareGL.Drivers.GdiPlus
 			_currentClearColor = color;
 		}
 		
-		public unsafe void BindArrayData(void* pData)
+		public void BindArrayData<T>(T[] pData) where T : struct
 		{
 		}
 

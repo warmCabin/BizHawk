@@ -34,7 +34,7 @@ namespace BizHawk.Bizware.BizwareGL.Drivers.SlimDX
 		INativeWindow OffscreenNativeWindow;
 
 		//rendering state
-		IntPtr _pVertexData;
+		object[] _pVertexData;
 		Pipeline _CurrPipeline;
 		GLControlWrapper_SlimDX9 _CurrentControl;
 
@@ -949,22 +949,20 @@ namespace BizHawk.Bizware.BizwareGL.Drivers.SlimDX
 			return ret;
 		}
 
-		public unsafe void DrawArrays(gl.PrimitiveType mode, int count)
+		public void DrawArrays(gl.PrimitiveType mode, int count)
 		{
+			void CallDrawUserPrimitives<T>(T[] vertexData) where T : struct
+				=> dev.DrawUserPrimitives(PrimitiveType.TriangleStrip, count - 2, vertexData);
+
 			if (mode != gl.PrimitiveType.TriangleStrip) throw new NotSupportedException();
-			dev.DrawUserPrimitives(
-				PrimitiveType.TriangleStrip,
-				count - 2, // vert count -> primitive count
-				(void*) (byte*) _pVertexData.ToPointer(),
-				(uint) ((PipelineWrapper) _CurrPipeline.Opaque).VertexStride
-			);
+
+			var firstVertex = _pVertexData[0];
+			if (firstVertex is GuiRendererVertexData) CallDrawUserPrimitives(Array.ConvertAll(_pVertexData, o => (GuiRendererVertexData) o));
+			else if (firstVertex is RetroShaderVertexData) CallDrawUserPrimitives(Array.ConvertAll(_pVertexData, o => (RetroShaderVertexData) o));
+			else throw new NotSupportedException();
 		}
 
-		
-		public unsafe void BindArrayData(void* pData)
-		{
-			_pVertexData = new IntPtr(pData);
-		}
+		public void BindArrayData<T>(T[] pData) where T : struct => _pVertexData = Array.ConvertAll<T, object>(pData, o => o);
 
 		public void BeginScene()
 		{

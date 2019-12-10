@@ -89,12 +89,14 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="RetroShader.cs" />
+    <Compile Include="RetroShaderVertexData.cs" />
     <Compile Include="Shader.cs" />
     <Compile Include="StringRenderer.cs" />
     <Compile Include="TexAtlas.cs" />
     <Compile Include="Art.cs" />
     <Compile Include="Texture2d.cs" />
     <Compile Include="UniformInfo.cs" />
+    <Compile Include="GuiRendererVertexData.cs" />
     <Compile Include="VertexLayout.cs" />
   </ItemGroup>
   <ItemGroup>

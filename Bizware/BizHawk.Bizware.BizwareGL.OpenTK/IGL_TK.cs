@@ -408,9 +408,10 @@ namespace BizHawk.Bizware.BizwareGL.Drivers.OpenTK
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, mode);
 		}
 
-		public unsafe void BindArrayData(void* pData)
+		public unsafe void BindArrayData<T>(T[] pData) where T : struct
 		{
-			MyBindArrayData(sStatePendingVertexLayout, pData);
+			//TODO
+//			MyBindArrayData(sStatePendingVertexLayout, pData);
 		}
 
 		public void DrawArrays(PrimitiveType mode, int count)

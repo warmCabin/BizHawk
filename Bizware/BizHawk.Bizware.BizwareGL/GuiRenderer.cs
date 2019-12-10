@@ -233,33 +233,24 @@ namespace BizHawk.Bizware.BizwareGL
 			DrawInternal(art, x, y, w, h, false, tex.IsUpsideDown);
 		}
 
-		unsafe void DrawInternal(Art art, float x, float y, float w, float h, bool fx, bool fy)
+		void DrawInternal(Art art, float x, float y, float w, float h, bool fx, bool fy)
 		{
+			PrepDrawSubrectInternal(art.BaseTexture);
+
+			var u0 = fx ? art.u1 : art.u0;
+			var u1 = fx ? art.u0 : art.u1;
 			//TEST: d3d shouldnt ever use this, it was a gl hack. maybe we can handle it some other way in gl (fix the projection? take a render-to-texture arg to the gui view transforms?)
 			fy = false;
+			var v0 = fy ? art.v1 : art.v0;
+			var v1 = fy ? art.v0 : art.v1;
+			Owner.BindArrayData(new[] {
+				new GuiRendererVertexData(x, y, u0, v0, CornerColors[0]),
+				new GuiRendererVertexData(x + art.Width, y, u1, v0, CornerColors[1]),
+				new GuiRendererVertexData(x, y + art.Height, u0, v1, CornerColors[2]),
+				new GuiRendererVertexData(x + art.Width, y + art.Height, u1, v1,  CornerColors[3])
+			});
 
-			float u0, v0, u1, v1;
-			if (fx) { u0 = art.u1; u1 = art.u0; }
-			else { u0 = art.u0; u1 = art.u1; }
-			if (fy) { v0 = art.v1; v1 = art.v0; }
-			else { v0 = art.v0; v1 = art.v1; }
-
-			float[] data = new float[32] {
-			  x,y, u0,v0, CornerColors[0].R, CornerColors[0].G, CornerColors[0].B, CornerColors[0].A,
-			  x+art.Width,y, u1,v0, CornerColors[1].R, CornerColors[1].G, CornerColors[1].B, CornerColors[1].A,
-			  x,y+art.Height, u0,v1, CornerColors[2].R, CornerColors[2].G, CornerColors[2].B, CornerColors[2].A,
-			  x+art.Width,y+art.Height, u1,v1,  CornerColors[3].R, CornerColors[3].G, CornerColors[3].B, CornerColors[3].A,
-			};
-
-			Texture2d tex = art.BaseTexture;
-
-			PrepDrawSubrectInternal(tex);
-
-			fixed (float* pData = &data[0])
-			{
-				Owner.BindArrayData(pData);
-				Owner.DrawArrays(PrimitiveType.TriangleStrip, 4);
-			}
+			Owner.DrawArrays(PrimitiveType.TriangleStrip, 4);
 		}
 
 		unsafe void PrepDrawSubrectInternal(Texture2d tex)
@@ -292,41 +283,12 @@ namespace BizHawk.Bizware.BizwareGL
 
 		unsafe void EmitRectangleInternal(float x, float y, float w, float h, float u0, float v0, float u1, float v1)
 		{
-			float* pData = stackalloc float[32];
-			pData[0] = x;
-			pData[1] = y;
-			pData[2] = u0;
-			pData[3] = v0;
-			pData[4] = CornerColors[0].R;
-			pData[5] = CornerColors[0].G;
-			pData[6] = CornerColors[0].B;
-			pData[7] = CornerColors[0].A;
-			pData[8] = x + w;
-			pData[9] = y;
-			pData[10] = u1;
-			pData[11] = v0;
-			pData[12] = CornerColors[1].R;
-			pData[13] = CornerColors[1].G;
-			pData[14] = CornerColors[1].B;
-			pData[15] = CornerColors[1].A;
-			pData[16] = x;
-			pData[17] = y + h;
-			pData[18] = u0;
-			pData[19] = v1;
-			pData[20] = CornerColors[2].R;
-			pData[21] = CornerColors[2].G;
-			pData[22] = CornerColors[2].B;
-			pData[23] = CornerColors[2].A;
-			pData[24] = x + w;
-			pData[25] = y + h;
-			pData[26] = u1;
-			pData[27] = v1;
-			pData[28] = CornerColors[3].R;
-			pData[29] = CornerColors[3].G;
-			pData[30] = CornerColors[3].B;
-			pData[31] = CornerColors[3].A;
-
-			Owner.BindArrayData(pData);
+			Owner.BindArrayData(new[] {
+				new GuiRendererVertexData(x, y, u0, v0, CornerColors[0]),
+				new GuiRendererVertexData(x + w, y, u1, v0, CornerColors[1]),
+				new GuiRendererVertexData(x, y + h, u0, v1, CornerColors[2]),
+				new GuiRendererVertexData(x + w, y + h, u1, v1, CornerColors[3])
+			});
 			Owner.DrawArrays(PrimitiveType.TriangleStrip, 4);
 
 #if DEBUG
