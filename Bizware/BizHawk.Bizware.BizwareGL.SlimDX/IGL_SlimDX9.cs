@@ -949,21 +949,15 @@ namespace BizHawk.Bizware.BizwareGL.Drivers.SlimDX
 			return ret;
 		}
 
-		public unsafe void DrawArrays(gl.PrimitiveType mode, int first, int count)
+		public unsafe void DrawArrays(gl.PrimitiveType mode, int count)
 		{
-			PrimitiveType pt = PrimitiveType.TriangleStrip;
-			
-			if(mode != gl.PrimitiveType.TriangleStrip)
-				throw new NotSupportedException();
-
-			//for tristrip
-			int primCount = (count - 2);
-
-			var pw = _CurrPipeline.Opaque as PipelineWrapper;
-			int stride = pw.VertexStride;
-			byte* ptr = (byte*)_pVertexData.ToPointer() + first * stride;
-
-			dev.DrawUserPrimitives(pt, primCount, (void*)ptr, (uint)stride);
+			if (mode != gl.PrimitiveType.TriangleStrip) throw new NotSupportedException();
+			dev.DrawUserPrimitives(
+				PrimitiveType.TriangleStrip,
+				count - 2, // vert count -> primitive count
+				(void*) (byte*) _pVertexData.ToPointer(),
+				(uint) ((PipelineWrapper) _CurrPipeline.Opaque).VertexStride
+			);
 		}
 
 		

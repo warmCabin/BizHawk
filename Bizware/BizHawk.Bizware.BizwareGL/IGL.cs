@@ -108,7 +108,7 @@ namespace BizHawk.Bizware.BizwareGL
 		/// Draws based on the currently set pipeline, VertexLayout and ArrayData.
 		/// Count is the VERT COUNT not the primitive count
 		/// </summary>
-		void DrawArrays(PrimitiveType mode, int first, int count);
+		void DrawArrays(PrimitiveType mode, int count);
 
 		/// <summary>
 		/// resolves the texture into a new BitmapBuffer

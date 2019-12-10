@@ -102,7 +102,7 @@ namespace BizHawk.Bizware.BizwareGL.Drivers.GdiPlus
 		{
 		}
 
-		public void DrawArrays(PrimitiveType mode, int first, int count)
+		public void DrawArrays(PrimitiveType mode, int count)
 		{
 		}
 

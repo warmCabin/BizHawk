@@ -413,9 +413,9 @@ namespace BizHawk.Bizware.BizwareGL.Drivers.OpenTK
 			MyBindArrayData(sStatePendingVertexLayout, pData);
 		}
 
-		public void DrawArrays(PrimitiveType mode, int first, int count)
+		public void DrawArrays(PrimitiveType mode, int count)
 		{
-			GL.DrawArrays((global::OpenTK.Graphics.OpenGL.PrimitiveType)mode, first, count);
+			GL.DrawArrays((global::OpenTK.Graphics.OpenGL.PrimitiveType)mode, 0, count);
 		}
 
 		public void SetPipelineUniform(PipelineUniform uniform, bool value)

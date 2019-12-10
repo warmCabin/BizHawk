@@ -258,7 +258,7 @@ namespace BizHawk.Bizware.BizwareGL
 			fixed (float* pData = &data[0])
 			{
 				Owner.BindArrayData(pData);
-				Owner.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
+				Owner.DrawArrays(PrimitiveType.TriangleStrip, 4);
 			}
 		}
 
@@ -327,7 +327,7 @@ namespace BizHawk.Bizware.BizwareGL
 			pData[31] = CornerColors[3].A;
 
 			Owner.BindArrayData(pData);
-			Owner.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
+			Owner.DrawArrays(PrimitiveType.TriangleStrip, 4);
 
 #if DEBUG
 			Debug.Assert(BlendStateSet);
