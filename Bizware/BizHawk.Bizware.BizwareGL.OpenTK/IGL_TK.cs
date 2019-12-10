@@ -11,6 +11,7 @@
 
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.IO;
 using System.Collections.Generic;
@@ -410,8 +411,10 @@ namespace BizHawk.Bizware.BizwareGL.Drivers.OpenTK
 
 		public unsafe void BindArrayData<T>(T[] pData) where T : struct
 		{
-			//TODO
-//			MyBindArrayData(sStatePendingVertexLayout, pData);
+			var ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(T)) * pData.Length);
+			Marshal.StructureToPtr(pData, ptr, true); // used as void* so no need to pin elements individually
+			MyBindArrayData(sStatePendingVertexLayout, ptr.ToPointer());
+			Marshal.FreeHGlobal(ptr);
 		}
 
 		public void DrawArrays(PrimitiveType mode, int count)
